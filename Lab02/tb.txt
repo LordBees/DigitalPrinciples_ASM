@@ -1,0 +1,87 @@
+;Delay.asm. This is a PIC assembly language source file for a time delay
+; Author: Your Name
+;Date
+
+;**********************************SETUP***************************
+include"P16F877.INC"	;This tells the assembler to 'include' 
+				;another source file
+;TIMREG  EQU   	 H'0020' 	;This tells the assembler that                                                  					             ;register 20 is named (or equates to) 
+delval	     EQU	 H'0005'	;this is the delay time value 5
+					;to allow you to single step around.
+INNER EQU H'0020'
+OUTER EQU H'0021'
+outval EQU H'0000'
+inval EQU H'0000'
+
+;*******************************PORT SETUP*************************
+Banksel 	TRISD		;change register bank (page)
+clrf	 PORTD		;make PORTD an output port
+banksel	 PORTD	;change back to original bank
+;************************************MAIN**************************
+start	movlw 0			;move 'literal'value 0 into the W register
+movwf	  PORTD		;clear LEDs on PORTD
+loop	incf PORTD,F		;update the LEDs by incrementing them 
+;movlw delO
+;movwf OUTER
+;call	  delay2			;Call delay subroutine
+
+movlw outval;load register outer
+movwf OUTER
+;timeo decfsz OUTER,F
+;goto delayt
+;nop				;do nothing at all for one machine cycle						                          ;except increment the program counter
+goto	  loop			;go back to the instruction labelled 'loop'
+;******************************DELAY SUBROUTINE****************
+;;delay	movlw	  delval			;load w with delay time value
+;movwf	  TIMREG		;and put it into register
+;time	decfsz  TIMREG,F		;subtract one and skip next instruction if is zero
+;goto	  time			;go back and take another one off until 0
+;return				;return to call point
+
+;delayt
+;movlw delI
+;movwf INNER
+;timei decfsz INNER,F
+;goto delayt
+;return
+
+
+;delay
+;movlw outval;load register outer
+;movwf OUTER
+;call delaypre;
+;return
+
+;delay sub
+;;delaypre
+;;movlw inval
+;movwf INNER
+;loop decfsz OUTER;dec register outer till 0 if not call sub
+;call delaysub
+;return
+
+;delaysub
+;loop decfsz INNER
+;call delaysub
+;return
+
+
+
+
+
+delayx
+movlw inval;load register outer
+movwf INNER
+decfsz OUTER
+call delayi
+return
+
+delayi
+decfsz INNER
+call delayi
+return
+
+
+
+
+end				;this tells the assembler that we're done.

@@ -1,0 +1,9 @@
+;first asm file
+include "P16F877.INC";include register names
+
+start movlw 0 
+
+loop addlw 1
+	 nop
+goto loop
+	 end 
