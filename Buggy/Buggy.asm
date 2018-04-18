@@ -49,8 +49,12 @@ inval	EQU H'0020'
 
 ;movlw targdel
 ;movwf dMov
-targdel EQU H'0008'
-dMov	EQU H'0022';;addr 0x0022
+targdel EQU H'0032';04'	;amount of rotations to do
+targbk  EQU H'0019'	;amount of turns back to go
+dMov	EQU H'0022';;addr 0x0022 ;	register for counting backwards
+
+;Rotd EQU H'0023';rotation register
+;Rott EQU H'00050';;200 steps for buggy 1 rot
 
 Start movlw     0xFF         ;DON'T FORGET TO COMMENT EACH LINE TO SHOW YOU 
                              ;UNDERSTAND.
@@ -67,11 +71,6 @@ Start movlw     0xFF         ;DON'T FORGET TO COMMENT EACH LINE TO SHOW YOU
      movwf	ANSELH      ; PortB pins are digitial (important as RB0 is switch)
 
 									
-
-;*********** THIS SECTION WILL ROTATE BOTH MOTORS VERY  SLOWLY **********
-;DON'T FORGET TO COMMENT EVERY LINE TO SHOW YOU UNDERSTAND
-;AND THESE NEED TO BE SHOWING ON YOUR LISTING FILE
-
 
 
 ;--main
@@ -90,152 +89,156 @@ main
 	goto main
 
 ;------------------movement routines---------------------
-Backward 
+Backward ;go backward
        	movlw  H'00C6';1100 0110	     
-   		movwf  PORTD	    
-       	call delay 
+   		movwf  PORTD  ;move to working reg	    
+       	call   delay  ;delay to allow time for motor to turn 
 
        	movlw  H'0093';1001 0011
-     	movwf  PORTD
-		call delay
+     	movwf  PORTD  ;move to working reg	
+		call   delay  ;delay to allow time for motor to turn
 
        	movlw  H'0039';0011 1001
-     	movwf   PORTD
-		call delay 
+     	movwf  PORTD  ;move to working reg
+		call   delay  ;delay to allow time for motor to turn 
              
        	movlw  H'006C';0110 1100
-     	movwf  PORTD 
-       	call delay
+     	movwf  PORTD  ;move to working reg
+       	call   delay  ;delay to allow time for motor to turn
 
-       	return;goto Forward   
+       	return		  ;return from movement function  
 
-Leftb	nop
+Leftb ;go left backwards
 		movlw  H'0006';0000 0110	     
-   		movwf  PORTD	    
-       	call delay 
+   		movwf  PORTD  ;move to working reg    
+       	call delay    ;delay to allow time for motor to turn 
 
        	movlw  H'0003';0000 0011
-     	movwf  PORTD
-		call delay
+     	movwf  PORTD  ;move to working reg
+		call delay    ;delay to allow time for motor to turn 
 
        	movlw  H'0009';0000 1001
-     	movwf   PORTD
-		call delay 
+     	movwf   PORTD ;move to working reg
+		call delay    ;delay to allow time for motor to turn 
              
        	movlw  H'000C';0000 1100
-     	movwf  PORTD 
-       	call delay
+     	movwf  PORTD  ;move to working reg
+       	call delay    ;delay to allow time for motor to turn 
 		
-		return;goto Left
+		return		  ;return from movement function
 
-Rightb	nop
+Rightb ;go right backwards
 		movlw  H'00C0';1100 0000	     
-   		movwf  PORTD	    
-       	call delay 
+   		movwf  PORTD  ;move to working reg   
+       	call delay 	  ;delay to allow time for motor to turn 
 
        	movlw  H'0090';1001 0000
-     	movwf  PORTD
-		call delay
+     	movwf  PORTD  ;move to working reg
+		call delay    ;delay to allow time for motor to turn 
 
        	movlw  H'0030';0011 0000
-     	movwf   PORTD
-		call delay 
+     	movwf   PORTD ;move to working reg
+		call delay    ;delay to allow time for motor to turn 
              
        	movlw  H'0060';0110 0000
-     	movwf  PORTD 
-		call delay
+     	movwf  PORTD  ;move to working reg
+		call delay    ;delay to allow time for motor to turn
 		
-		return;goto Right
+		return		  ;return from movement function
 
 Forward 				;R|L
        	movlw  H'006C';	     
-   		movwf  PORTD	    
-       	call delay 
+   		movwf  PORTD  ;move to working reg	    
+       	call delay    ;delay to allow time for motor to turn
 
        	movlw  H'0039';
-     	movwf  PORTD
-		call delay
+     	movwf  PORTD  ;move to working reg
+		call delay    ;delay to allow time for motor to turn
 
        	movlw  H'0093';
-     	movwf   PORTD
-		call delay 
+     	movwf   PORTD ;move to working reg
+		call delay    ;delay to allow time for motor to turn
              
        	movlw  H'00C6';
-     	movwf  PORTD 
-       	call delay
+     	movwf  PORTD  ;move to working reg
+       	call delay    ;delay to allow time for motor to turn
 
-       	return;goto Forward   
+       	return		  ;return from movement function 
 
 Leftf	nop
 		movlw  H'000C';	     
-   		movwf  PORTD	    
-       	call delay 
+   		movwf  PORTD  ;move to working reg	    
+       	call delay    ;delay to allow time for motor to turn
 
        	movlw  H'0009';
-     	movwf  PORTD
-		call delay
+     	movwf  PORTD  ;move to working reg
+		call delay    ;delay to allow time for motor to turn
 
        	movlw  H'0003';
-     	movwf   PORTD
-		call delay 
+     	movwf   PORTD ;move to working reg
+		call delay    ;delay to allow time for motor to turn
              
        	movlw  H'0006';
-     	movwf  PORTD 
-       	call delay
+     	movwf  PORTD  ;move to working reg
+       	call delay    ;delay to allow time for motor to turn
 		
-		return;goto Left
+		return		  ;return from movement function
 
 Rightf	nop
-		movlw  H'0060'	     
-   		movwf  PORTD	    
-       	call delay 
+		movlw  H'0060';	     
+   		movwf  PORTD  ;move to working reg	    
+       	call delay    ;delay to allow time for motor to turn
 
-       	movlw  H'0030'
-     	movwf  PORTD
-		call delay
+       	movlw  H'0030';
+     	movwf  PORTD  ;move to working reg
+		call delay    ;delay to allow time for motor to turn
 
        	movlw  H'0090'
-     	movwf   PORTD
-		call delay 
+     	movwf   PORTD ;move to working reg
+		call delay    ;delay to allow time for motor to turn
              
        	movlw  H'0060'
-     	movwf  PORTD 
-		call delay
+     	movwf  PORTD  ;move to working reg
+		call delay    ;delay to allow time for motor to turn
 		
-		return;goto Right
+		return		  ;return from movement function
 
-;--------- quick routines
+;----quick routines----;
 SRB nop;stop right back
-	call Rightb
-;	call delayMove
-;	call Backward
+	call Leftb;Rightb
 	;call delayMove
-	decfsz dMov,F
+	;call Backward
+	;call delayMove
+	decfsz dMov,F;decfsz Rotd,F ;decrement set rotations until 0, if 0 skip next instruction
 	goto SRB
-	movlw targdel
-	movwf dMov
+	movlw targbk
+	movwf dMov;reload register with reverse turn amount
 SRB2 nop
-	call Backward
-	decfsz dMov,F
+	call Backward;go backward
+	decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
 	goto SRB2
 	return
 
+
 SLB nop;stop left back
-	call Leftb
-	decfsz dMov,F
+	call Rightb;Leftb
+	decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
 	goto SLB
 
-	movlw targdel
-	movwf dMov
+	movlw targbk
+	movwf dMov;reload register with reverse turn amount
 SLB2 nop
 	call Backward
-	decfsz dMov,F
+	decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
 	goto SLB2
 	return
 
+
 SBB nop;stop Back forward
 	call Forward
-	call Rightf
+	decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
+	goto SBB
+	;call Rightf
 	return
 ;----------checking routine
 
@@ -244,22 +247,29 @@ lsense
 		;btfsc
 		;movf PORTB,0
 		movlw targdel
-		movwf dMov
-		btfsc PORTB,1;5
+		movwf dMov;load register with amount of loops needed to turn by 1/4 (200 steps per complete rotation)
+
+		;movlw Rott;move steps of rotation into the working register
+		;movwf Rotd
+
+		btfsc PORTB,1;5	;bit test bit1 of portb(left sensor)
+		return			;if clear skip next instruction
+		call SLB
 		return
-		call SRB
 ;rsense
 rsense 	nop
 		movlw targdel
 		movwf dMov
-		btfsc PORTB,2;3
+		btfsc PORTB,2;3	;bit test bit2 of portb(right sensor)
+		return			;if clear skip next instruction
+		call SRB
 		return
-		call SLB
 		
 ;bsense
 bsense	nop
-		btfsc PORTB,3;6
-		call SBB
+		btfsc PORTB,3;6	;bit test bit3 of portb(back sensor)
+		return		
+		call SBB		;if clear skip next instruction
 		return
 		             
     
@@ -269,9 +279,9 @@ delay 	movlw outval;load register outer
 		movwf OUTER
 delayx 	movlw inval;load register inner
 		movwf INNER
-delayin decfsz INNER,F
+delayin decfsz INNER,F;decrement until zero then skip out
 		goto delayin
-		decfsz OUTER,F
+		decfsz OUTER,F;decrement untill zero then skip out
 		goto delayx
 		return
 

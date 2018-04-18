@@ -1,11 +1,11 @@
 MPLINK 4.49, Linker
-Linker Map File - Created Wed Apr 11 11:55:47 2018
+Linker Map File - Created Thu Apr 19 00:01:26 2018
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
                    .org_0       code   0x000000    program   0x000000
-                   .org_1       code   0x000000    program   0x000188
+                   .org_1       code   0x000000    program   0x00018c
    .config_300001_BUGGY.O    romdata   0x300001    program   0x000001
    .config_300002_BUGGY.O    romdata   0x300002    program   0x000001
    .config_300003_BUGGY.O    romdata   0x300003    program   0x000001
@@ -23,11 +23,11 @@ Linker Map File - Created Wed Apr 11 11:55:47 2018
                               Program Memory Usage 
                                Start         End      
                            ---------   ---------      
-                            0x000000    0x000187      
+                            0x000000    0x00018b      
                             0x300001    0x300003      
                             0x300005    0x300006      
                             0x300008    0x30000d      
-            403 out of 33048 program addresses used, program memory utilization is 1%
+            407 out of 33048 program addresses used, program memory utilization is 1%
 
 
 
@@ -35,24 +35,24 @@ Linker Map File - Created Wed Apr 11 11:55:47 2018
                      Name    Address   Location    Storage File                     
                 ---------  ---------  ---------  --------- ---------                
                  Backward   0x000026    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                  Forward   0x000090    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                  Forward   0x00008c    program     static H:\DP_MPLAB\Buggy\Buggy.asm
                     Leftb   0x000048    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                    Leftf   0x0000b2    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   Rightb   0x00006c    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   Rightf   0x0000d6    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                      SBB   0x000136    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                      SLB   0x000118    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                     SLB2   0x000128    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                      SRB   0x0000fa    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                     SRB2   0x00010a    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                    Leftf   0x0000ae    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   Rightb   0x00006a    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   Rightf   0x0000d2    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                      SBB   0x000132    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                      SLB   0x000114    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                     SLB2   0x000124    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                      SRB   0x0000f6    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                     SRB2   0x000106    program     static H:\DP_MPLAB\Buggy\Buggy.asm
                     Start   0x000000    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   bsense   0x00015c    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                    delay   0x000166    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                delayMove   0x00017c    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-               delayMove1   0x000180    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                  delayin   0x00016e    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   delayx   0x00016a    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   lsense   0x000142    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   bsense   0x00015e    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                    delay   0x00016a    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                delayMove   0x000180    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+               delayMove1   0x000184    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                  delayin   0x000172    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   delayx   0x00016e    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   lsense   0x000140    program     static H:\DP_MPLAB\Buggy\Buggy.asm
                      main   0x000012    program     static H:\DP_MPLAB\Buggy\Buggy.asm
                    rsense   0x00014e    program     static H:\DP_MPLAB\Buggy\Buggy.asm
 
@@ -65,22 +65,22 @@ Linker Map File - Created Wed Apr 11 11:55:47 2018
                      main   0x000012    program     static H:\DP_MPLAB\Buggy\Buggy.asm
                  Backward   0x000026    program     static H:\DP_MPLAB\Buggy\Buggy.asm
                     Leftb   0x000048    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   Rightb   0x00006c    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                  Forward   0x000090    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                    Leftf   0x0000b2    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   Rightf   0x0000d6    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                      SRB   0x0000fa    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                     SRB2   0x00010a    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                      SLB   0x000118    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                     SLB2   0x000128    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                      SBB   0x000136    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   lsense   0x000142    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   Rightb   0x00006a    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                  Forward   0x00008c    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                    Leftf   0x0000ae    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   Rightf   0x0000d2    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                      SRB   0x0000f6    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                     SRB2   0x000106    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                      SLB   0x000114    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                     SLB2   0x000124    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                      SBB   0x000132    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   lsense   0x000140    program     static H:\DP_MPLAB\Buggy\Buggy.asm
                    rsense   0x00014e    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   bsense   0x00015c    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                    delay   0x000166    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                   delayx   0x00016a    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                  delayin   0x00016e    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-                delayMove   0x00017c    program     static H:\DP_MPLAB\Buggy\Buggy.asm
-               delayMove1   0x000180    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   bsense   0x00015e    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                    delay   0x00016a    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                   delayx   0x00016e    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                  delayin   0x000172    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+                delayMove   0x000180    program     static H:\DP_MPLAB\Buggy\Buggy.asm
+               delayMove1   0x000184    program     static H:\DP_MPLAB\Buggy\Buggy.asm
 
 
