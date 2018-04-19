@@ -1,7 +1,7 @@
 
-	include "p16f877.inc"
+include "p16f877.inc";include header file
 
-INNER EQU H'0020'
+INNER EQU H'0020';setup delay values
 OUTER EQU H'0021'
 outval EQU H'0000'
 inval EQU H'0000'
@@ -9,14 +9,14 @@ inval EQU H'0000'
 UPCOUNT 	EQU H'0022'
 DOWNCOUNT 	EQU H'0023'
 
-	banksel TRISD
-	clrf    TRISD;;warning caused by this could be portd instead
-	banksel PORTD
-	clrf	PORTD
+		banksel TRISD;;setup input and output banks
+		clrf    TRISD
+		banksel PORTD
+		clrf	PORTD
 
-start   movlw 0x0A
+start   movlw 0x0A;move 10 into the upcount register
 		movwf DOWNCOUNT;;move 10 
-		movlw 0
+		movlw 0;move 0 into the downcount register
 		;movwf PORTD;clear output and Upcount ;;not/Dn count
 		movwf UPCOUNT
 		;;movwf DOWNCOUNT

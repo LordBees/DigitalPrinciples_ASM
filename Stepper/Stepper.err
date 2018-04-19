@@ -1,3 +1,3 @@
-Warning[205] H:\DP_MPLAB\STEPPER\STEPPER.ASM 14 : Found directive in column 1. (banksel)
-Message[302] H:\DP_MPLAB\STEPPER\STEPPER.ASM 15 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Warning[205] H:\DP_MPLAB\STEPPER\STEPPER.ASM 119 : Found directive in column 1. (end)
+Warning[205] H:\DP_MPLAB\STEPPER\STEPPER.ASM 16 : Found directive in column 1. (banksel)
+Message[302] H:\DP_MPLAB\STEPPER\STEPPER.ASM 17 : Register in operand not in bank 0.  Ensure that bank bits are correct.
+Warning[205] H:\DP_MPLAB\STEPPER\STEPPER.ASM 122 : Found directive in column 1. (end)

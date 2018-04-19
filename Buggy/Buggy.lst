@@ -1,19 +1,20 @@
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  1
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
                       00001 ; PIC18F45K20 buggycodes starter.asm
-                      00002 
-                      00003 ; *******************************************************************
-                      00004 
-                      00005 ;DON'T  FORGET TO REMEMBER TO OUTPUT 00000000 TO PORT D IF YOU STOP THE PROGRAM. 
-                      00006 ;THE PORT AND MOTORS WILL HAVE ONE OF THE 4 CODES ON IT AND MAYBE OVERHEAT!
-                      00007 
-                      00008 ;************************************************************************
-                      00009         
-                      00010 #include <p18f45k20.inc>
+                      00002 ;author robert painter,Luke clayton
+                      00003 ;buggy object avoidance code
+                      00004 ; *******************************************************************
+                      00005 
+                      00006 ;DON'T  FORGET TO REMEMBER TO OUTPUT 00000000 TO PORT D IF YOU STOP THE PROGRAM. 
+                      00007 ;THE PORT AND MOTORS WILL HAVE ONE OF THE 4 CODES ON IT AND MAYBE OVERHEAT!
+                      00008 
+                      00009 ;************************************************************************
+                      00010         
+                      00011 #include <p18f45k20.inc>
                       00001         LIST
                       00002 
                       00003 ;==========================================================================
@@ -23,331 +24,329 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00007 ;==========================================================================
                       00008 
                       01568         LIST
-                      00011 
-                      00012 ;WE CAN SET UP THE CONFIGURATION HERE INSTEAD OF BY SETTING 'configuration bits' AS WE DID BEFORE. 
-                      00013 ;BUT HAVE A LOOK AT THEM:    click on 'Configure' at the top when you have assembled your code.
-                      00014  
-08 07 1E 0B 81 0F C0 000015         config FOSC = INTIO67
+                      00012 
+                      00013 ;WE CAN SET UP THE CONFIGURATION HERE INSTEAD OF BY SETTING 'configuration bits' AS WE DID BEFORE. 
+                      00014 ;BUT HAVE A LOOK AT THEM:    click on 'Configure' at the top when you have assembled your code.
+                      00015  
+08 07 1E 0B 81 0F C0 000016         config FOSC = INTIO67
        F E0 0F 40 
-                      00016         config FCMEN = OFF
-                      00017         config IESO = OFF
-                      00018         config PWRT = OFF, BOREN = SBORDIS, BORV = 30                           
-                      00019         config WDTEN = OFF, WDTPS = 32768                                       
-                      00020         config MCLRE = OFF, LPT1OSC = OFF, PBADEN = ON, CCP2MX = PORTC          
-                      00021         config STVREN = ON, LVP = OFF, XINST = OFF                              
-                      00022         config CP0 = OFF, CP1 = OFF, CP2 = OFF, CP3 = OFF                       
-                      00023         config CPB = OFF, CPD = OFF                                             
-                      00024         config WRT0 = OFF, WRT1 = OFF, WRT2 = OFF, WRT3 = OFF                   
-                      00025         config WRTB = OFF, WRTC = OFF, WRTD = OFF                          
-                      00026         config EBTR0 = OFF, EBTR1 = OFF, EBTR2 = OFF, EBTR3 = OFF          
-                      00027         config EBTRB = OFF      
-                      00028 
+                      00017         config FCMEN = OFF
+                      00018         config IESO = OFF
+                      00019         config PWRT = OFF, BOREN = SBORDIS, BORV = 30                           
+                      00020         config WDTEN = OFF, WDTPS = 32768                                       
+                      00021         config MCLRE = OFF, LPT1OSC = OFF, PBADEN = ON, CCP2MX = PORTC          
+                      00022         config STVREN = ON, LVP = OFF, XINST = OFF                              
+                      00023         config CP0 = OFF, CP1 = OFF, CP2 = OFF, CP3 = OFF                       
+                      00024         config CPB = OFF, CPD = OFF                                             
+                      00025         config WRT0 = OFF, WRT1 = OFF, WRT2 = OFF, WRT3 = OFF                   
+                      00026         config WRTB = OFF, WRTC = OFF, WRTD = OFF                          
+                      00027         config EBTR0 = OFF, EBTR1 = OFF, EBTR2 = OFF, EBTR3 = OFF          
+                      00028         config EBTRB = OFF      
                       00029 
-                      00030     cblock     0x20     ;THIS SAYS LEAVE 20 BYTES (FOR THE DELAY ROUTINES) JUST AFTER THE PROGRAM
-                      00031                         ;INSTRUCTIONS WHEREVER IT FINISHES
-                      00032 
-                      00033         ;Register names defined For the delay routine
-                      00034 
-  00000020            00035         TIMINNER        
-  00000021            00036         TIMOUTER
-                      00037         endc
-                      00038      
-000000                00039      org 0x0                    ;Start assembling the program code at address 0
-                      00040 
-                      00041 ;****************************SET UP REGISTERS****************************
-                      00042             
-                      00043 ;NOTE THAT WITH THIS PIC WE DO NOT HAVE TO CHANGE BANKS TO ACCESS THESE REGISTERS
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  2
+                      00030 
+                      00031     cblock     0x20     ;THIS SAYS LEAVE 20 BYTES (FOR THE DELAY ROUTINES) JUST AFTER THE PROGRAM
+                      00032                         ;INSTRUCTIONS WHEREVER IT FINISHES
+                      00033 
+                      00034         ;Register names defined For the delay routine
+                      00035 
+  00000020            00036         TIMINNER        
+  00000021            00037         TIMOUTER
+                      00038         endc
+                      00039      
+000000                00040      org 0x0                    ;Start assembling the program code at address 0
+                      00041 
+                      00042 ;****************************SET UP REGISTERS****************************
+                      00043             
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00044 
-  00000020            00045 INNER   EQU H'0020'
-  00000021            00046 OUTER   EQU H'0021'
-  00000020            00047 outval  EQU H'0020'
-  00000020            00048 inval   EQU H'0020'
-                      00049 
-                      00050 ;movlw targdel
-                      00051 ;movwf dMov
-  00000032            00052 targdel EQU H'0032';04' ;amount of rotations to do
-  00000019            00053 targbk  EQU H'0019'     ;amount of turns back to go
-  00000022            00054 dMov    EQU H'0022';;addr 0x0022 ;      register for counting backwards
-                      00055 
-                      00056 ;Rotd EQU H'0023';rotation register
-                      00057 ;Rott EQU H'00050';;200 steps for buggy 1 rot
-                      00058 
-000000 0EFF           00059 Start movlw     0xFF         ;DON'T FORGET TO COMMENT EACH LINE TO SHOW YOU 
-                      00060                              ;UNDERSTAND.
-                      00061 
-000002 6E92           00062      movwf    TRISA             ; (Port A is connected to the potentiometer but we do not need this for 
+                      00044 ;NOTE THAT WITH THIS PIC WE DO NOT HAVE TO CHANGE BANKS TO ACCESS THESE REGISTERS
+                      00045 
+  00000020            00046 INNER   EQU H'0020';setup delay values
+  00000021            00047 OUTER   EQU H'0021'
+  00000020            00048 outval  EQU H'0020'
+  00000020            00049 inval   EQU H'0020'
+                      00050 
+                      00051 ;movlw targdel
+                      00052 ;movwf dMov
+  00000032            00053 targdel EQU H'0032';04' ;amount of rotations to do
+  00000019            00054 targbk  EQU H'0019'     ;amount of turns back to go
+  00000022            00055 dMov    EQU H'0022';;addr 0x0022 ;      register for counting backwards
+                      00056 
+                      00057 ;Rotd EQU H'0023';rotation register
+                      00058 ;Rott EQU H'00050';;200 steps for buggy 1 rot
+                      00059 
+000000 0EFF           00060 Start movlw     0xFF         ;DON'T FORGET TO COMMENT EACH LINE TO SHOW YOU 
+                      00061                              ;UNDERSTAND.
+                      00062 
+000002 6E92           00063      movwf    TRISA             ; (Port A is connected to the potentiometer but we do not need this for 
                             the 
-                      00063                                                         ; project).
-000004 6A95           00064      clrf       TRISD                
-                      00065      ;movlw     B'00101111';'1110100';'00101111';0x01
-000006 0E0E           00066          movlw  0x0E;B'00001011'                        
-000008 6E93           00067      movwf      TRISB                   
-00000A 0E1F           00068      movlw      0x1F              ; PIC18F45K20 Data sheet see page 136 for ANSEL Bits 1= Analog 0 = Dig
-                            ital
-00000C 6E7E           00069      movwf      ANSEL         ; PortA pins are all analog, PortE pins are digital
-00000E 0E00           00070      movlw      0x00      ; see page 137 ANSELH bits 0 for Digital
-000010 6E7F           00071      movwf      ANSELH      ; PortB pins are digitial (important as RB0 is switch)
-                      00072 
-                      00073                                                                         
-                      00074 
+                      00064                                                         ; project).
+000004 6A95           00065      clrf       TRISD                
+                      00066      ;movlw     B'00101111';'1110100';'00101111';0x01
+000006 0E0E           00067          movlw  0x0E;B'00001011'                        
+000008 6E93           00068      movwf      TRISB                   
+00000A 0E1F           00069      movlw      0x1F                    ; PIC18F45K20 Data sheet see page 136 for ANSEL Bits 1= Analog 0
+                             = Digital
+00000C 6E7E           00070      movwf      ANSEL                   ; PortA pins are all analog, PortE pins are digital
+00000E 0E00           00071      movlw      0x00                            ; see page 137 ANSELH bits 0 for Digital
+000010 6E7F           00072      movwf      ANSELH                  ; PortB pins are digitial (important as RB0 is switch)
+                      00073 
+                      00074                                                                         
                       00075 
-                      00076 ;--main
-000012                00077 main
-                      00078         ;;
-                      00079 
-                      00080                 ;movf PORTB,0;;to keep leds on or bitmask on leds
-                      00081                 ;iorlw B'00101111';0x2F
-                      00082                 ;goto main
-                      00083         ;call Forward
-000012 ECA0 F000      00084                 call    lsense;poll each set of sensors to see what to do
-000016 ECA7 F000      00085                 call    rsense
-00001A ECAF F000      00086                 call    bsense
-00001E EC46 F000      00087                 call    Forward;;go forward
-                      00088         ;;
-000022 EF09 F000      00089         goto main
-                      00090 
-                      00091 ;------------------movement routines---------------------
-000026                00092 Backward ;go backward
-000026 0EC6           00093         movlw  H'00C6';1100 0110             
-000028 6E83           00094                 movwf  PORTD  ;move to working reg          
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  3
+                      00076 
+                      00077 ;--main
+000012                00078 main
+                      00079         ;;
+                      00080 
+                      00081                 ;movf PORTB,0;;to keep leds on or bitmask on leds
+                      00082                 ;iorlw B'00101111';0x2F
+                      00083                 ;goto main
+                      00084         ;call Forward
+000012 ECA0 F000      00085                 call    lsense;poll each set of sensors to see what to do
+000016 ECA7 F000      00086                 call    rsense
+00001A ECAF F000      00087                 call    bsense
+00001E EC46 F000      00088                 call    Forward;;go forward
+                      00089         ;;
+000022 EF09 F000      00090         goto main
+                      00091 
+                      00092 ;------------------movement routines---------------------
+000026                00093 Backward ;go backward
+000026 0EC6           00094         movlw  H'00C6';1100 0110             
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-00002A ECB5 F000      00095         call   delay  ;delay to allow time for motor to turn 
-                      00096 
-00002E 0E93           00097         movlw  H'0093';1001 0011
-000030 6E83           00098         movwf  PORTD  ;move to working reg      
-000032 ECB5 F000      00099                 call   delay  ;delay to allow time for motor to turn
-                      00100 
-000036 0E39           00101         movlw  H'0039';0011 1001
-000038 6E83           00102         movwf  PORTD  ;move to working reg
-00003A ECB5 F000      00103                 call   delay  ;delay to allow time for motor to turn 
-                      00104              
-00003E 0E6C           00105         movlw  H'006C';0110 1100
-000040 6E83           00106         movwf  PORTD  ;move to working reg
-000042 ECB5 F000      00107         call   delay  ;delay to allow time for motor to turn
-                      00108 
-000046 0012           00109         return            ;return from movement function  
-                      00110 
-000048                00111 Leftb ;go left backwards
-000048 0E06           00112                 movlw  H'0006';0000 0110             
-00004A 6E83           00113                 movwf  PORTD  ;move to working reg    
-00004C ECB5 F000      00114         call delay    ;delay to allow time for motor to turn 
-                      00115 
-000050 0E03           00116         movlw  H'0003';0000 0011
-000052 6E83           00117         movwf  PORTD  ;move to working reg
-000054 ECB5 F000      00118                 call delay    ;delay to allow time for motor to turn 
-                      00119 
-000058 0E09           00120         movlw  H'0009';0000 1001
-00005A 6E83           00121         movwf   PORTD ;move to working reg
-00005C ECB5 F000      00122                 call delay    ;delay to allow time for motor to turn 
-                      00123              
-000060 0E0C           00124         movlw  H'000C';0000 1100
-000062 6E83           00125         movwf  PORTD  ;move to working reg
-000064 ECB5 F000      00126         call delay    ;delay to allow time for motor to turn 
-                      00127                 
-000068 0012           00128                 return            ;return from movement function
-                      00129 
-00006A                00130 Rightb ;go right backwards
-00006A 0EC0           00131                 movlw  H'00C0';1100 0000             
-00006C 6E83           00132                 movwf  PORTD  ;move to working reg   
-00006E ECB5 F000      00133         call delay        ;delay to allow time for motor to turn 
-                      00134 
-000072 0E90           00135         movlw  H'0090';1001 0000
-000074 6E83           00136         movwf  PORTD  ;move to working reg
-000076 ECB5 F000      00137                 call delay    ;delay to allow time for motor to turn 
-                      00138 
-00007A 0E30           00139         movlw  H'0030';0011 0000
-00007C 6E83           00140         movwf   PORTD ;move to working reg
-00007E ECB5 F000      00141                 call delay    ;delay to allow time for motor to turn 
-                      00142              
-000082 0E60           00143         movlw  H'0060';0110 0000
-000084 6E83           00144         movwf  PORTD  ;move to working reg
-000086 ECB5 F000      00145                 call delay    ;delay to allow time for motor to turn
-                      00146                 
-00008A 0012           00147                 return            ;return from movement function
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  4
+000028 6E83           00095                 movwf  PORTD  ;move to working reg          
+00002A ECB5 F000      00096         call   delay  ;delay to allow time for motor to turn 
+                      00097 
+00002E 0E93           00098         movlw  H'0093';1001 0011
+000030 6E83           00099         movwf  PORTD  ;move to working reg      
+000032 ECB5 F000      00100                 call   delay  ;delay to allow time for motor to turn
+                      00101 
+000036 0E39           00102         movlw  H'0039';0011 1001
+000038 6E83           00103         movwf  PORTD  ;move to working reg
+00003A ECB5 F000      00104                 call   delay  ;delay to allow time for motor to turn 
+                      00105              
+00003E 0E6C           00106         movlw  H'006C';0110 1100
+000040 6E83           00107         movwf  PORTD  ;move to working reg
+000042 ECB5 F000      00108         call   delay  ;delay to allow time for motor to turn
+                      00109 
+000046 0012           00110         return            ;return from movement function  
+                      00111 
+000048                00112 Leftb ;go left backwards
+000048 0E06           00113                 movlw  H'0006';0000 0110             
+00004A 6E83           00114                 movwf  PORTD  ;move to working reg    
+00004C ECB5 F000      00115         call delay    ;delay to allow time for motor to turn 
+                      00116 
+000050 0E03           00117         movlw  H'0003';0000 0011
+000052 6E83           00118         movwf  PORTD  ;move to working reg
+000054 ECB5 F000      00119                 call delay    ;delay to allow time for motor to turn 
+                      00120 
+000058 0E09           00121         movlw  H'0009';0000 1001
+00005A 6E83           00122         movwf   PORTD ;move to working reg
+00005C ECB5 F000      00123                 call delay    ;delay to allow time for motor to turn 
+                      00124              
+000060 0E0C           00125         movlw  H'000C';0000 1100
+000062 6E83           00126         movwf  PORTD  ;move to working reg
+000064 ECB5 F000      00127         call delay    ;delay to allow time for motor to turn 
+                      00128                 
+000068 0012           00129                 return            ;return from movement function
+                      00130 
+00006A                00131 Rightb ;go right backwards
+00006A 0EC0           00132                 movlw  H'00C0';1100 0000             
+00006C 6E83           00133                 movwf  PORTD  ;move to working reg   
+00006E ECB5 F000      00134         call delay        ;delay to allow time for motor to turn 
+                      00135 
+000072 0E90           00136         movlw  H'0090';1001 0000
+000074 6E83           00137         movwf  PORTD  ;move to working reg
+000076 ECB5 F000      00138                 call delay    ;delay to allow time for motor to turn 
+                      00139 
+00007A 0E30           00140         movlw  H'0030';0011 0000
+00007C 6E83           00141         movwf   PORTD ;move to working reg
+00007E ECB5 F000      00142                 call delay    ;delay to allow time for motor to turn 
+                      00143              
+000082 0E60           00144         movlw  H'0060';0110 0000
+000084 6E83           00145         movwf  PORTD  ;move to working reg
+000086 ECB5 F000      00146                 call delay    ;delay to allow time for motor to turn
+                      00147                 
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  4
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00148 
-00008C                00149 Forward                                 ;R|L
-00008C 0E6C           00150         movlw  H'006C';      
-00008E 6E83           00151                 movwf  PORTD  ;move to working reg          
-000090 ECB5 F000      00152         call delay    ;delay to allow time for motor to turn
-                      00153 
-000094 0E39           00154         movlw  H'0039';
-000096 6E83           00155         movwf  PORTD  ;move to working reg
-000098 ECB5 F000      00156                 call delay    ;delay to allow time for motor to turn
-                      00157 
-00009C 0E93           00158         movlw  H'0093';
-00009E 6E83           00159         movwf   PORTD ;move to working reg
-0000A0 ECB5 F000      00160                 call delay    ;delay to allow time for motor to turn
-                      00161              
-0000A4 0EC6           00162         movlw  H'00C6';
-0000A6 6E83           00163         movwf  PORTD  ;move to working reg
-0000A8 ECB5 F000      00164         call delay    ;delay to allow time for motor to turn
-                      00165 
-0000AC 0012           00166         return            ;return from movement function 
-                      00167 
-0000AE 0000           00168 Leftf   nop
-0000B0 0E0C           00169                 movlw  H'000C';      
-0000B2 6E83           00170                 movwf  PORTD  ;move to working reg          
-0000B4 ECB5 F000      00171         call delay    ;delay to allow time for motor to turn
-                      00172 
-0000B8 0E09           00173         movlw  H'0009';
-0000BA 6E83           00174         movwf  PORTD  ;move to working reg
-0000BC ECB5 F000      00175                 call delay    ;delay to allow time for motor to turn
-                      00176 
-0000C0 0E03           00177         movlw  H'0003';
-0000C2 6E83           00178         movwf   PORTD ;move to working reg
-0000C4 ECB5 F000      00179                 call delay    ;delay to allow time for motor to turn
-                      00180              
-0000C8 0E06           00181         movlw  H'0006';
-0000CA 6E83           00182         movwf  PORTD  ;move to working reg
-0000CC ECB5 F000      00183         call delay    ;delay to allow time for motor to turn
-                      00184                 
-0000D0 0012           00185                 return            ;return from movement function
-                      00186 
-0000D2 0000           00187 Rightf  nop
-0000D4 0E60           00188                 movlw  H'0060';      
-0000D6 6E83           00189                 movwf  PORTD  ;move to working reg          
-0000D8 ECB5 F000      00190         call delay    ;delay to allow time for motor to turn
-                      00191 
-0000DC 0E30           00192         movlw  H'0030';
-0000DE 6E83           00193         movwf  PORTD  ;move to working reg
-0000E0 ECB5 F000      00194                 call delay    ;delay to allow time for motor to turn
-                      00195 
-0000E4 0E90           00196         movlw  H'0090'
-0000E6 6E83           00197         movwf   PORTD ;move to working reg
-0000E8 ECB5 F000      00198                 call delay    ;delay to allow time for motor to turn
-                      00199              
-0000EC 0E60           00200         movlw  H'0060'
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  5
+00008A 0012           00148                 return            ;return from movement function
+                      00149 
+00008C                00150 Forward                                 ;R|L
+00008C 0E6C           00151         movlw  H'006C';0110 1100
+00008E 6E83           00152                 movwf  PORTD  ;move to working reg          
+000090 ECB5 F000      00153         call delay    ;delay to allow time for motor to turn
+                      00154 
+000094 0E39           00155         movlw  H'0039';0011 1001
+000096 6E83           00156         movwf  PORTD  ;move to working reg
+000098 ECB5 F000      00157                 call delay    ;delay to allow time for motor to turn
+                      00158 
+00009C 0E93           00159         movlw  H'0093';1001 0011
+00009E 6E83           00160         movwf   PORTD ;move to working reg
+0000A0 ECB5 F000      00161                 call delay    ;delay to allow time for motor to turn
+                      00162              
+0000A4 0EC6           00163         movlw  H'00C6';;1100 0110
+0000A6 6E83           00164         movwf  PORTD  ;move to working reg
+0000A8 ECB5 F000      00165         call delay    ;delay to allow time for motor to turn
+                      00166 
+0000AC 0012           00167         return            ;return from movement function 
+                      00168 
+0000AE 0000           00169 Leftf   nop
+0000B0 0E0C           00170                 movlw  H'000C';0000 1100             
+0000B2 6E83           00171                 movwf  PORTD  ;move to working reg          
+0000B4 ECB5 F000      00172         call delay    ;delay to allow time for motor to turn
+                      00173 
+0000B8 0E09           00174         movlw  H'0009';0000 1001
+0000BA 6E83           00175         movwf  PORTD  ;move to working reg
+0000BC ECB5 F000      00176                 call delay    ;delay to allow time for motor to turn
+                      00177 
+0000C0 0E03           00178         movlw  H'0003';0000 0011
+0000C2 6E83           00179         movwf   PORTD ;move to working reg
+0000C4 ECB5 F000      00180                 call delay    ;delay to allow time for motor to turn
+                      00181              
+0000C8 0E06           00182         movlw  H'0006';0000 0110
+0000CA 6E83           00183         movwf  PORTD  ;move to working reg
+0000CC ECB5 F000      00184         call delay    ;delay to allow time for motor to turn
+                      00185                 
+0000D0 0012           00186                 return            ;return from movement function
+                      00187 
+0000D2 0000           00188 Rightf  nop
+0000D4 0E60           00189                 movlw  H'0060';0110 0000
+0000D6 6E83           00190                 movwf  PORTD  ;move to working reg          
+0000D8 ECB5 F000      00191         call delay    ;delay to allow time for motor to turn
+                      00192 
+0000DC 0E30           00193         movlw  H'0030';0011 0000
+0000DE 6E83           00194         movwf  PORTD  ;move to working reg
+0000E0 ECB5 F000      00195                 call delay    ;delay to allow time for motor to turn
+                      00196 
+0000E4 0E90           00197         movlw  H'0090';1001 0000
+0000E6 6E83           00198         movwf   PORTD ;move to working reg
+0000E8 ECB5 F000      00199                 call delay    ;delay to allow time for motor to turn
+                      00200              
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  5
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0000EE 6E83           00201         movwf  PORTD  ;move to working reg
-0000F0 ECB5 F000      00202                 call delay    ;delay to allow time for motor to turn
-                      00203                 
-0000F4 0012           00204                 return            ;return from movement function
-                      00205 
-                      00206 ;----quick routines----;
-0000F6 0000           00207 SRB nop;stop right back
-0000F8 EC24 F000      00208         call Leftb;Rightb
-                      00209         ;call delayMove
-                      00210         ;call Backward
-                      00211         ;call delayMove
-0000FC 2E22           00212         decfsz dMov,F;decfsz Rotd,F ;decrement set rotations until 0, if 0 skip next instruction
-0000FE EF7B F000      00213         goto SRB
-000102 0E19           00214         movlw targbk
-000104 6E22           00215         movwf dMov;reload register with reverse turn amount
-000106 0000           00216 SRB2 nop
-000108 EC13 F000      00217         call Backward;go backward
-00010C 2E22           00218         decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
-00010E EF83 F000      00219         goto SRB2
-000112 0012           00220         return
-                      00221 
+0000EC 0E60           00201         movlw  H'0060';0110 0000
+0000EE 6E83           00202         movwf  PORTD  ;move to working reg
+0000F0 ECB5 F000      00203                 call delay    ;delay to allow time for motor to turn
+                      00204                 
+0000F4 0012           00205                 return            ;return from movement function
+                      00206 
+                      00207 ;----quick routines----;
+0000F6 0000           00208 SRB nop;stop right back
+0000F8 EC24 F000      00209         call Leftb;Rightb
+                      00210         ;call delayMove
+                      00211         ;call Backward
+                      00212         ;call delayMove
+0000FC 2E22           00213         decfsz dMov,F;decfsz Rotd,F ;decrement set rotations until 0, if 0 skip next instruction
+0000FE EF7B F000      00214         goto SRB
+000102 0E19           00215         movlw targbk
+000104 6E22           00216         movwf dMov;reload register with reverse turn amount
+000106 0000           00217 SRB2 nop
+000108 EC13 F000      00218         call Backward;go backward
+00010C 2E22           00219         decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
+00010E EF83 F000      00220         goto SRB2
+000112 0012           00221         return
                       00222 
-000114 0000           00223 SLB nop;stop left back
-000116 EC35 F000      00224         call Rightb;Leftb
-00011A 2E22           00225         decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
-00011C EF8A F000      00226         goto SLB
-                      00227 
-000120 0E19           00228         movlw targbk
-000122 6E22           00229         movwf dMov;reload register with reverse turn amount
-000124 0000           00230 SLB2 nop
-000126 EC13 F000      00231         call Backward
-00012A 2E22           00232         decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
-00012C EF92 F000      00233         goto SLB2
-000130 0012           00234         return
-                      00235 
+                      00223 
+000114 0000           00224 SLB nop;stop left back
+000116 EC35 F000      00225         call Rightb;Leftb
+00011A 2E22           00226         decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
+00011C EF8A F000      00227         goto SLB
+                      00228 
+000120 0E19           00229         movlw targbk
+000122 6E22           00230         movwf dMov;reload register with reverse turn amount
+000124 0000           00231 SLB2 nop
+000126 EC13 F000      00232         call Backward
+00012A 2E22           00233         decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
+00012C EF92 F000      00234         goto SLB2
+000130 0012           00235         return
                       00236 
-000132 0000           00237 SBB nop;stop Back forward
-000134 EC46 F000      00238         call Forward
-000138 2E22           00239         decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
-00013A EF99 F000      00240         goto SBB
-                      00241         ;call Rightf
-00013E 0012           00242         return
-                      00243 ;----------checking routine
-                      00244 
-                      00245 ;lsense
-000140                00246 lsense 
-                      00247                 ;btfsc
-                      00248                 ;movf PORTB,0
-000140 0E32           00249                 movlw targdel
-000142 6E22           00250                 movwf dMov;load register with amount of loops needed to turn by 1/4 (200 steps per compl
+                      00237 
+000132 0000           00238 SBB nop;stop Back forward
+000134 EC46 F000      00239         call Forward
+000138 2E22           00240         decfsz dMov,F;decrement set steps until 0, if 0 skip next instruction
+00013A EF99 F000      00241         goto SBB
+                      00242         ;call Rightf
+00013E 0012           00243         return
+                      00244 ;----------checking routine
+                      00245 
+                      00246 ;lsense
+000140                00247 lsense 
+                      00248                 ;btfsc
+                      00249                 ;movf PORTB,0
+000140 0E32           00250                 movlw targdel
+000142 6E22           00251                 movwf dMov;load register with amount of loops needed to turn by 1/4 (200 steps per compl
                             ete rotation)
-                      00251 
-                      00252                 ;movlw Rott;move steps of rotation into the working register
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  6
+                      00252 
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  6
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00253                 ;movwf Rotd
-                      00254 
-000144 B281           00255                 btfsc PORTB,1;5 ;bit test bit1 of portb(left sensor)
-000146 0012           00256                 return                  ;if clear skip next instruction
-000148 EC8A F000      00257                 call SLB
-00014C 0012           00258                 return
-                      00259 ;rsense
-00014E 0000           00260 rsense  nop
-000150 0E32           00261                 movlw targdel
-000152 6E22           00262                 movwf dMov
-000154 B481           00263                 btfsc PORTB,2;3 ;bit test bit2 of portb(right sensor)
-000156 0012           00264                 return                  ;if clear skip next instruction
-000158 EC7B F000      00265                 call SRB
-00015C 0012           00266                 return
-                      00267                 
-                      00268 ;bsense
-00015E 0000           00269 bsense  nop
-000160 B681           00270                 btfsc PORTB,3;6 ;bit test bit3 of portb(back sensor)
-Warning[203]: Found opcode in column 1. (return)
-000162 0012           00271 return          
-Warning[203]: Found opcode in column 1. (call)
-000164 EC99 F000      00272 call SBB                ;if clear skip next instruction
-000168 0012           00273                 return
-                      00274                              
-                      00275     
-                      00276  ;*************************DELAY ROUTINE*****************    
-                      00277 
-00016A 0E20           00278 delay   movlw outval;load register outer
-00016C 6E21           00279                 movwf OUTER
-00016E 0E20           00280 delayx  movlw inval;load register inner
-000170 6E20           00281                 movwf INNER
-000172 2E20           00282 delayin decfsz INNER,F;decrement until zero then skip out
-000174 EFB9 F000      00283                 goto delayin
-000178 2E21           00284                 decfsz OUTER,F;decrement untill zero then skip out
-00017A EFB7 F000      00285                 goto delayx
-00017E 0012           00286                 return
-                      00287 
-000180 0E32           00288 delayMove       movlw targdel
-000182 6E22           00289                         movwf dMov
-000184 2E20           00290 delayMove1      decfsz INNER,F
-000186 EFC2 F000      00291                         goto delayMove1
-00018A 0012           00292                         return
-                      00293                 
-                      00294 
+                      00253                 ;movlw Rott;move steps of rotation into the working register
+                      00254                 ;movwf Rotd
+                      00255 
+000144 B281           00256                 btfsc PORTB,1;5 ;bit test bit1 of portb(left sensor)
+000146 0012           00257                 return                  ;if clear skip next instruction
+000148 EC8A F000      00258                 call SLB
+00014C 0012           00259                 return
+                      00260 ;rsense
+00014E 0000           00261 rsense  nop
+000150 0E32           00262                 movlw targdel
+000152 6E22           00263                 movwf dMov
+000154 B481           00264                 btfsc PORTB,2;3 ;bit test bit2 of portb(right sensor)
+000156 0012           00265                 return                  ;if clear skip next instruction
+000158 EC7B F000      00266                 call SRB
+00015C 0012           00267                 return
+                      00268                 
+                      00269 ;bsense
+00015E 0000           00270 bsense  nop
+000160 B681           00271                 btfsc PORTB,3;6 ;bit test bit3 of portb(back sensor)
+000162 0012           00272                 return          
+000164 EC99 F000      00273                 call SBB                ;if clear skip next instruction
+000168 0012           00274                 return
+                      00275                              
+                      00276     
+                      00277  ;*************************DELAY ROUTINE*****************    
+                      00278 
+00016A 0E20           00279 delay   movlw outval;load register outer
+00016C 6E21           00280                 movwf OUTER
+00016E 0E20           00281 delayx  movlw inval;load register inner
+000170 6E20           00282                 movwf INNER
+000172 2E20           00283 delayin decfsz INNER,F;decrement until zero then skip out
+000174 EFB9 F000      00284                 goto delayin
+000178 2E21           00285                 decfsz OUTER,F;decrement untill zero then skip out
+00017A EFB7 F000      00286                 goto delayx
+00017E 0012           00287                 return
+                      00288 
+000180 0E32           00289 delayMove       movlw targdel
+000182 6E22           00290                         movwf dMov
+000184 2E20           00291 delayMove1      decfsz INNER,F
+000186 EFC2 F000      00292                         goto delayMove1
+00018A 0012           00293                         return
+                      00294                 
                       00295 
-                      00296 ;**********************************************************************************             
+                      00296 
+                      00297 ;**********************************************************************************             
 Warning[205]: Found directive in column 1. (end)
-                      00297 end
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  7
+                      00298 end
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  7
 
 
 SYMBOL TABLE
@@ -406,7 +405,7 @@ ANS7                              00000007
 ANS8                              00000000
 ANS9                              00000001
 ANSEL                             00000F7E
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  8
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  8
 
 
 SYMBOL TABLE
@@ -465,7 +464,7 @@ C2RSEL                            00000004
 C2SP                              00000003
 CCP1                              00000002
 CCP1CON                           00000FBD
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE  9
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE  9
 
 
 SYMBOL TABLE
@@ -524,7 +523,7 @@ D                                 00000005
 DC                                00000001
 DC1B0                             00000004
 DC1B1                             00000005
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 10
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 10
 
 
 SYMBOL TABLE
@@ -583,7 +582,7 @@ GIE                               00000007
 GIEH                              00000007
 GIEL                              00000006
 GIE_GIEH                          00000007
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 11
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 11
 
 
 SYMBOL TABLE
@@ -642,7 +641,7 @@ IOCB6                             00000006
 IOCB7                             00000007
 IOFS                              00000002
 IPEN                              00000007
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 12
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 12
 
 
 SYMBOL TABLE
@@ -701,7 +700,7 @@ LATE1                             00000001
 LATE2                             00000002
 LVDCON                            00000FD2
 LVDEN                             00000004
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 13
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 13
 
 
 SYMBOL TABLE
@@ -760,7 +759,7 @@ OSCFIP                            00000007
 OSCTUNE                           00000F9B
 OSTS                              00000003
 OUTER                             00000021
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 14
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 14
 
 
 SYMBOL TABLE
@@ -819,7 +818,7 @@ PREINC2                           00000FDC
 PROD                              00000FF3
 PRODH                             00000FF4
 PRODL                             00000FF3
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 15
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 15
 
 
 SYMBOL TABLE
@@ -878,7 +877,7 @@ RCEN                              00000003
 RCIDL                             00000006
 RCIE                              00000005
 RCIF                              00000005
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 16
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 16
 
 
 SYMBOL TABLE
@@ -937,7 +936,7 @@ SP0                               00000000
 SP1                               00000001
 SP2                               00000002
 SP3                               00000003
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 17
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 17
 
 
 SYMBOL TABLE
@@ -996,7 +995,7 @@ T13CKI                            00000000
 T1CKI                             00000000
 T1CKPS0                           00000004
 T1CKPS1                           00000005
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 18
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 18
 
 
 SYMBOL TABLE
@@ -1055,7 +1054,7 @@ TMR3H                             00000FB3
 TMR3IE                            00000001
 TMR3IF                            00000001
 TMR3IP                            00000001
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 19
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 19
 
 
 SYMBOL TABLE
@@ -1114,7 +1113,7 @@ TUN1                              00000001
 TUN2                              00000002
 TUN3                              00000003
 TUN4                              00000004
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 20
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 20
 
 
 SYMBOL TABLE
@@ -1173,7 +1172,7 @@ _CONFIG3H                         00300005
 _CONFIG4L                         00300006
 _CONFIG5H                         00300009
 _CONFIG5L                         00300008
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 21
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 21
 
 
 SYMBOL TABLE
@@ -1232,7 +1231,7 @@ _IDLOC5                           00200005
 _IDLOC6                           00200006
 _IDLOC7                           00200007
 _IESO_OFF_1H                      0000007F
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 22
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 22
 
 
 SYMBOL TABLE
@@ -1291,7 +1290,7 @@ dMov                              00000022
 delay                             0000016A
 delayMove                         00000180
 delayMove1                        00000184
-MPASM  5.51                         BUGGY.ASM   4-19-2018  0:01:25         PAGE 23
+MPASM  5.51                         BUGGY.ASM   4-19-2018  9:38:25         PAGE 23
 
 
 SYMBOL TABLE
@@ -1326,7 +1325,7 @@ Program Memory Bytes Free: 32361
 
 
 Errors   :     0
-Warnings :     3 reported,     0 suppressed
+Warnings :     1 reported,     0 suppressed
 Messages :     0 reported,     0 suppressed
 
 

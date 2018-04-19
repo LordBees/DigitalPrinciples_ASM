@@ -1,11 +1,13 @@
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  1
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00001 
-                      00002                         include "p16f877.inc"
+                      00001 ;author:robert painter
+                      00002 ;button counter for 7 seg display with debounce
+                      00003 
+                      00004                         include "p16f877.inc";include
                       00001         LIST
                       00002 
                       00003 ;==========================================================================
@@ -15,255 +17,162 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00007 ;==========================================================================
                       00008 
                       00540         LIST
-                      00003 
-  00000020            00004 INNER           EQU H'0020'
-  00000021            00005 OUTER           EQU H'0021'
-  00000000            00006 outval          EQU H'0000';changed untilll i can fix the dregister loading for this
-  00000000            00007 inval           EQU H'0000'
-                      00008 
-  00000022            00009 UPCOUNT         EQU H'0022'
-  00000023            00010 DOWNCOUNT       EQU H'0023'
-                      00011 
-  00000024            00012 check           EQU H'0024'
+                      00005 
+  00000020            00006 INNER           EQU H'0020';setup delay values
+  00000021            00007 OUTER           EQU H'0021'
+  00000000            00008 outval          EQU H'0000'
+  00000000            00009 inval           EQU H'0000'
+                      00010 
+  00000022            00011 UPCOUNT         EQU H'0022'
+  00000023            00012 DOWNCOUNT       EQU H'0023'
                       00013 
-                      00014 
-                      00015         ;banksel TRISD
-                      00016         ;clrf    TRISD;;warning caused by this could be portd instead
-                      00017         ;banksel PORTD
-                      00018         ;clrf   PORTD
-                      00019 
-0000   1683 1303      00020                 banksel         TRISD;set ports to output
+  00000024            00014 check           EQU H'0024'
+                      00015 
+                      00016 
+                      00017 
+0000   1683 1303      00018                 banksel         TRISD;set ports to output
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0002   0188           00021                 clrf            TRISD
-                      00022 
-0003   1283 1303      00023                 banksel         PORTD;clear output
-0005   0188           00024                 clrf            PORTD
-                      00025 ;               movlw           H'0000';0x00
-0006   0088           00026                 movwf           PORTD;,0x00;//changed from clrf
-                      00027 
-                      00028 ;               banksel         TRISB;set input from button
-                      00029 ;               movlw       0xFF
-                      00030 ;               movwf           TRISB
-                      00031                 
-                      00032 
-0007   300A           00033 start   movlw 0x0A
-0008   00A3           00034                 movwf DOWNCOUNT;;move 10
-0009   3000           00035                 movlw 0x00
-000A   00A2           00036                 movwf UPCOUNT;movwf PORTD;clear output and Upcount ;;not/Dn count
-                      00037                 ;;movwf DOWNCOUNT
-                      00038 ;loop   incf PORTD,F
-                      00039 ;               movf UPCOUNT, 0;load upcount into working register
-                      00040                 ;call ldsm
+0002   0188           00019                 clrf            TRISD
+                      00020 
+0003   1283 1303      00021                 banksel         PORTD;clear output
+0005   0188           00022                 clrf            PORTD
+                      00023 ;               movlw           H'0000';0x00
+0006   0088           00024                 movwf           PORTD;,0x00;//changed from clrf
+                      00025 
+                      00026 ;               banksel         TRISB;set input from button
+                      00027 ;               movlw       0xFF
+                      00028 ;               movwf           TRISB
+                      00029                 
+                      00030 
+0007   300A           00031 start   movlw 0x0A
+0008   00A3           00032                 movwf DOWNCOUNT;;move 10
+0009   3000           00033                 movlw 0x00
+000A   00A2           00034                 movwf UPCOUNT;movwf PORTD;clear output and Upcount ;;not/Dn count
+                      00035                 ;;movwf DOWNCOUNT
+                      00036 ;loop   incf PORTD,F
+                      00037 ;               movf UPCOUNT, 0;load upcount into working register
+                      00038                 ;call ldsm
+                      00039 
+                      00040 
                       00041 
-                      00042 
-                      00043 
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  2
+000B   0000           00042 main    nop                                     ;debounce for increment button
+000C   1806           00043                 btfsc PORTB,0;1;0       ;bit test bit 0 of register PORTB, if 0 skip next instruction
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-000B   0000           00044 main    nop
-000C   1806           00045                 btfsc PORTB,0;1;0
-000D   2812           00046                 goto btn2
-000E   2040           00047                 call delay
-000F   1806           00048                 btfsc PORTB,0;1;0
-0010   2812           00049                 goto btn2
-0011   201A           00050                 call inc7seg
-                      00051                 ;goto main
-0012   0000           00052 btn2    nop
-0013   1886           00053                 btfsc PORTB,1;0
-0014   280B           00054                 goto main
-0015   2040           00055                 call delay
-0016   1886           00056                 btfsc PORTB,1;0
-0017   280B           00057                 goto main
-0018   2022           00058                 call dec7seg
-0019   280B           00059                 goto main
-                      00060 ;;main  movlw 0x01;;left switch
-                      00061 ;;              movwf check
-                      00062 ;;              movf PORTB,0;move portb input to working register
-                      00063 ;;              movwf check
-                      00064 ;;              ;xorlw check;xorlw check;xorlw check;;xor w with check
-                      00065 ;;              ;movwf PORTD
-                      00066 ;;              btfsc check,0;check,1;check if zero flag set, skip if clear
-                      00067 ;;              call inc7seg
-                      00068 ;;              ;btfss PORTB,0
-                      00069 ;;goto main;;debug testing first button
-                      00070 ;;      
-                      00071 ;;              movlw 0x02; right button
-                      00072 ;;              movwf check
-                      00073 ;;              movf PORTB,0;move portb input to working register
-                      00074 ;;              
-                      00075 ;;              xorlw check;;xor w with check
-                      00076 ;;              btfsc STATUS,F;check if zero flag set, skip if clear
-                      00077 ;;              call inc7seg
-                      00078 ;;              goto main
-                      00079 
-                      00080 
-                      00081 ;inc7seg        
-                      00082                 
-                      00083                 ;;call delay;delay from Lab2
-                      00084 ;               incf UPCOUNT, 1;update upcounter and copy to W
-                      00085 ;               movf UPCOUNT, 0;working register
-                      00086 ;               decfsz DOWNCOUNT,F
-                      00087 ;               call Table;call table sub
-                      00088 ;               movwf PORTD;;update leds with 7 seg
-                      00089 ;               ;goto loopsub
-                      00090 ;               ;goto start
-                      00091 ;;              return
-                      00092 
-001A   0000           00093 inc7seg nop;;increment 7 sec
-001B   203B           00094                 call Tableupd
-                      00095                 ;;call delay;delay from Lab2
-001C   0AA2           00096                 incf UPCOUNT, 1;update upcounter and copy to W
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  3
+000D   2812           00044                 goto btn2
+000E   2040           00045                 call delay
+000F   1806           00046                 btfsc PORTB,0;1;0       ;bit test bit 0 of register PORTB, if 0 skip next instruction
+0010   2812           00047                 goto btn2                       ;test twice to ensure button is still held down and pres
+                            s was intentional and not bounced
+0011   201A           00048                 call inc7seg
+                      00049                 ;goto main
+0012   0000           00050 btn2    nop                             ;debounce for decrement button
+0013   1886           00051                 btfsc PORTB,1;0 ;bit test bit 0 of register PORTB, if 0 skip next instruction
+0014   280B           00052                 goto main
+0015   2040           00053                 call delay
+0016   1886           00054                 btfsc PORTB,1;0 ;bit test bit 0 of register PORTB, if 0 skip next instruction
+0017   280B           00055                 goto main               ;test twice to ensure button is still held down and press was in
+                            tentional and not bounced
+0018   2022           00056                 call dec7seg
+0019   280B           00057                 goto main
+                      00058 
+                      00059 
+001A   0000           00060 inc7seg nop;;increment 7 sec
+001B   203B           00061                 call Tableupd   ;update 7seg value using lookup table
+                      00062                 ;;call delay;delay from Lab2
+001C   0AA2           00063                 incf UPCOUNT, 1 ;update upcounter and copy to W
+001D   0822           00064                 movf UPCOUNT, 0 ;working register
+                      00065                 ;;decfsz DOWNCOUNT,F
+                      00066                 ;call Table;call table sub
+                      00067                 
+001E   0BA3           00068                 decfsz DOWNCOUNT,F      ;;test to see if max reached if so call reset
+001F   0008           00069                 return
+0020   2049           00070                 call rst7seg ;if overflowed reset display to 0
+0021   0008           00071                 return
+                      00072 
+0022   0000           00073 dec7seg nop;;decrement 7 seg
+0023   203B           00074                 call Tableupd
+                      00075                 ;call Table;call table sub
+0024   0AA3           00076                 incf DOWNCOUNT,1
+0025   0823           00077                 movf DOWNCOUNT,0
+                      00078                 
+0026   0BA2           00079                 decfsz UPCOUNT,F;;test to see if max reached if so call reset
+0027   0008           00080                 return
+0028   204F           00081                 call rst7segt ;if underflowed reset display to 9
+0029   0008           00082                 return
+                      00083 
+                      00084 
+                      00085 ;lookup table
+002A   0782           00086 Table   addwf PCL,F;;mov w to pc
+                      00087 
+002B   3488           00088                 retlw H'0088';0
+002C   34ED           00089                 retlw H'00ED';1
+002D   3494           00090                 retlw H'0094';2
+002E   34A4           00091                 retlw H'00A4';3
+002F   34E1           00092                 retlw H'00E1';4
+0030   34A2           00093                 retlw H'00A2';5
+0031   3482           00094                 retlw H'0082';6
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-001D   0822           00097                 movf UPCOUNT, 0;working register
-                      00098                 ;;decfsz DOWNCOUNT,F
-                      00099                 ;call Table;call table sub
-                      00100                 
-001E   0BA3           00101                 decfsz DOWNCOUNT,F;;test to see if max reached if so call reset
-001F   0008           00102                 return
-0020   2051           00103                 call rst7seg
-0021   0008           00104                 return
-                      00105 
-0022   0000           00106 dec7seg nop;;decrement 7 seg
-0023   203B           00107                 call Tableupd
-                      00108                 ;call Table;call table sub
-0024   0AA3           00109                 incf DOWNCOUNT,1
-0025   0823           00110                 movf DOWNCOUNT,0
-                      00111                 
-0026   0BA2           00112                 decfsz UPCOUNT,F;;test to see if max reached if so call reset
-0027   0008           00113                 return
-0028   2057           00114                 call rst7segt
-                      00115                 
-                      00116                 
-0029   0008           00117                 return
-                      00118 
-                      00119 ;dec7seg        nop;;decrement 7 seg
-                      00120 ;               movf UPCOUNT,0
-                      00121 ;               call Table;call table sub
-                      00122 ;               movwf PORTD;;update leds with 7 seg
-                      00123 ;               ;;call delay;delay from Lab2
-                      00124 ;               ;decf UPCOUNT, 1;update upcounter and copy to W
-                      00125 ;               ;movf UPCOUNT, 0;working register
-                      00126 ;               ;;decfsz DOWNCOUNT,F
-                      00127 ;               ;call Table;call table sub
-                      00128 ;               incf DOWNCOUNT,1
-                      00129 ;               
-                      00130 ;               decfsz UPCOUNT,F;;test to see if max reached if so call reset
-                      00131 ;               return
-                      00132 ;               call rst7segt
-                      00133 ;               return
-                      00134 
-                      00135 ;dec7seg        nop;;decrement 7 seg
-                      00136 ;               movf UPCOUNT,0
-                      00137 ;               call Table;call table sub
-                      00138 ;               movwf PORTD;;update leds with 7 seg
-                      00139 ;               ;;call delay;delay from Lab2
-                      00140 ;               decf UPCOUNT, 1;update upcounter and copy to W
-                      00141 ;               movf UPCOUNT, 0;working register
-                      00142 ;               ;;decfsz DOWNCOUNT,F
-                      00143 ;               ;call Table;call table sub
-                      00144 ;               
-                      00145 ;               incfsz DOWNCOUNT,F;;test to see if max reached if so call reset
-                      00146 ;               
-                      00147 ;               return
-                      00148 ;               call rst7segt
-                      00149 ;               return
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  4
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-                      00150 
-                      00151 ;lookup table
-002A   0782           00152 Table   addwf PCL,F;;mov w to pc
-                      00153 
-002B   3488           00154                 retlw H'0088';0
-002C   34ED           00155                 retlw H'00ED';1
-002D   3494           00156                 retlw H'0094';2
-002E   34A4           00157                 retlw H'00A4';3
-002F   34E1           00158                 retlw H'00E1';4
-0030   34A2           00159                 retlw H'00A2';5
-0031   3482           00160                 retlw H'0082';6
-0032   34EC           00161                 retlw H'00EC';7
-0033   3480           00162                 retlw H'0080';8
-0034   34E0           00163                 retlw H'00E0';9
-0035   0008           00164                 return;10
-0036   0008           00165                 return;11
-0037   0008           00166                 return;12
-0038   0008           00167                 return;13
-0039   0008           00168                 return;14
-003A   0008           00169                 return;15
-                      00170 
-003B   0000           00171 Tableupd nop;
-003C   0822           00172                 movf UPCOUNT,0
-003D   202A           00173                 call Table;call table sub
-003E   0088           00174                 movwf PORTD;;update leds with 7 seg
-003F   0008           00175                 return
-                      00176 
-                      00177 ;delay subroutine
-0040   3000           00178 delay   movlw outval;load register outer
-0041   00A1           00179                 movwf OUTER
-0042   3000           00180 delayx  movlw inval;load register inner
-0043   00A0           00181                 movwf INNER
-0044   0BA0           00182 delayin decfsz INNER,F
-0045   2844           00183                 goto delayin
-0046   0BA1           00184                 decfsz OUTER,F
-0047   2842           00185                 goto delayx
-0048   0008           00186                 return
-                      00187 
-Warning[202]: Argument out of range.  Least significant bits used.
-0049   3000           00188 ldsm    movlw H'0500';load small delay
-                      00189                 ;;movf outval
-                      00190                 ;;movf inval
-004A   00A1           00191                 movwf OUTER
-004B   00A0           00192                 movwf INNER
-004C   0008           00193                 return
-                      00194 
-004D   3000           00195 ldlg    movlw H'0000';;loadlarge delay
-Message[305]: Using default destination of 1 (file).
-004E   0880           00196                 movf outval
-Message[305]: Using default destination of 1 (file).
-004F   0880           00197                 movf inval
-0050   0008           00198                 return
-                      00199 
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  5
-
-
-LOC  OBJECT CODE     LINE SOURCE TEXT
-  VALUE
-
-0051   0000           00200 rst7seg nop
-0052   300A           00201                 movlw 0x0A
-0053   00A3           00202                 movwf DOWNCOUNT;;move 10
-                      00203                 ;movwf check 
-0054   3000           00204                 movlw 0
-                      00205                 ;movwf PORTD;clear output and Upcount ;;not/Dn count
-0055   00A2           00206                 movwf UPCOUNT
-                      00207                 ;;movwf DOWNCOUNT
-0056   0008           00208                 return
-                      00209 
-0057   0000           00210 rst7segt nop
-0058   3000           00211                 movlw 0x0
-0059   00A3           00212                 movwf DOWNCOUNT;;move 10
-                      00213                 ;movwf check 
-005A   3009           00214                 movlw 0x09;test finish downcount
-                      00215                 ;movwf PORTD;clear output and Upcount ;;not/Dn count
-005B   00A2           00216                 movwf UPCOUNT
-                      00217                 ;;movwf DOWNCOUNT
-005C   202A           00218                 call Table;update table
-005D   0088           00219                 movwf PORTD;;update leds with 7 seg
-005E   0008           00220                 return
-                      00221 ;;end program
-                      00222                 end
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  6
+0032   34EC           00095                 retlw H'00EC';7
+0033   3480           00096                 retlw H'0080';8
+0034   34E0           00097                 retlw H'00E0';9
+0035   0008           00098                 return;10
+0036   0008           00099                 return;11
+0037   0008           00100                 return;12
+0038   0008           00101                 return;13
+0039   0008           00102                 return;14
+003A   0008           00103                 return;15
+                      00104 
+003B   0000           00105 Tableupd nop;updates 7seg with the value stored in the working register
+003C   0822           00106                 movf UPCOUNT,0
+003D   202A           00107                 call Table;call table sub
+003E   0088           00108                 movwf PORTD;;update leds with 7 seg
+003F   0008           00109                 return
+                      00110 
+                      00111 ;delay subroutine
+0040   3000           00112 delay   movlw outval;load register outer
+0041   00A1           00113                 movwf OUTER
+0042   3000           00114 delayx  movlw inval;load register inner
+0043   00A0           00115                 movwf INNER
+0044   0BA0           00116 delayin decfsz INNER,F;decrement, if 0, skip next instruction
+0045   2844           00117                 goto delayin
+0046   0BA1           00118                 decfsz OUTER,F;decrement, if 0, skip next instruction
+0047   2842           00119                 goto delayx
+0048   0008           00120                 return
+                      00121 
+0049   0000           00122 rst7seg nop;resets the 7 segment to 0
+004A   300A           00123                 movlw 0x0A
+004B   00A3           00124                 movwf DOWNCOUNT;;move 10 to register
+                      00125                 ;movwf check 
+004C   3000           00126                 movlw 0
+                      00127                 ;movwf PORTD;clear output and Upcount ;;not/Dn count
+004D   00A2           00128                 movwf UPCOUNT;move 0 to register
+                      00129                 ;;movwf DOWNCOUNT
+004E   0008           00130                 return
+                      00131 
+004F   0000           00132 rst7segt nop;resets the 7 segment display to 9
+0050   3000           00133                 movlw 0x0
+0051   00A3           00134                 movwf DOWNCOUNT;;move 0
+                      00135                 ;movwf check 
+0052   3009           00136                 movlw 0x09
+                      00137                 ;movwf PORTD;clear output and Upcount ;;not/Dn count
+0053   00A2           00138                 movwf UPCOUNT;moves 9 to upcount
+                      00139                 ;;movwf DOWNCOUNT
+0054   202A           00140                 call Table;update table
+0055   0088           00141                 movwf PORTD;;update leds with 7 seg
+0056   0008           00142                 return
+                      00143 ;;end program
+                      00144                 end
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  4
 
 
 SYMBOL TABLE
@@ -322,7 +231,7 @@ CSRC                              00000007
 D                                 00000005
 DATA_ADDRESS                      00000005
 DC                                00000001
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  7
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  5
 
 
 SYMBOL TABLE
@@ -381,7 +290,7 @@ OPTION_REG                        00000081
 OUTER                             00000021
 P                                 00000004
 PCFG0                             00000000
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  8
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  6
 
 
 SYMBOL TABLE
@@ -440,7 +349,7 @@ RC7                               00000007
 RC8_9                             00000006
 RC9                               00000006
 RCD8                              00000000
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE  9
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  7
 
 
 SYMBOL TABLE
@@ -499,7 +408,7 @@ T0SE                              00000004
 T1CKPS0                           00000004
 T1CKPS1                           00000005
 T1CON                             00000010
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE 10
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  8
 
 
 SYMBOL TABLE
@@ -558,7 +467,7 @@ TRISD                             00000088
 TRISD0                            00000000
 TRISD1                            00000001
 TRISD2                            00000002
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE 11
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE  9
 
 
 SYMBOL TABLE
@@ -617,7 +526,7 @@ _IDLOC1                           00002001
 _IDLOC2                           00002002
 _IDLOC3                           00002003
 _LP_OSC                           00003FFC
-MPASM  5.51                         LAB04.ASM   3-14-2018  11:57:50         PAGE 12
+MPASM  5.51                         LAB04.ASM   4-19-2018  6:28:09         PAGE 10
 
 
 SYMBOL TABLE
@@ -648,28 +557,26 @@ delayin                           00000044
 delayx                            00000042
 inc7seg                           0000001A
 inval                             00000000
-ldlg                              0000004D
-ldsm                              00000049
 main                              0000000B
 outval                            00000000
-rst7seg                           00000051
-rst7segt                          00000057
+rst7seg                           00000049
+rst7segt                          0000004F
 start                             00000007
 
 
 MEMORY USAGE MAP ('X' = Used,  '-' = Unused)
 
 0000 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXXX
-0040 : XXXXXXXXXXXXXXXX XXXXXXXXXXXXXXX- ---------------- ----------------
+0040 : XXXXXXXXXXXXXXXX XXXXXXX--------- ---------------- ----------------
 
 All other memory blocks unused.
 
-Program Memory Words Used:    95
-Program Memory Words Free:  8097
+Program Memory Words Used:    87
+Program Memory Words Free:  8105
 
 
 Errors   :     0
-Warnings :     1 reported,     0 suppressed
-Messages :     3 reported,     0 suppressed
+Warnings :     0 reported,     0 suppressed
+Messages :     1 reported,     0 suppressed
 
 

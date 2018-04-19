@@ -1,9 +1,11 @@
+;author:robert painter
+;button counter for 7 seg display with debounce
 
-			include "p16f877.inc"
+			include "p16f877.inc";include
 
-INNER 		EQU H'0020'
+INNER 		EQU H'0020';setup delay values
 OUTER 		EQU H'0021'
-outval 		EQU H'0000';changed untilll i can fix the dregister loading for this
+outval 		EQU H'0000'
 inval 		EQU H'0000'
 
 UPCOUNT 	EQU H'0022'
@@ -12,10 +14,6 @@ DOWNCOUNT 	EQU H'0023'
 check 		EQU H'0024'
 
 
-	;banksel TRISD
-	;clrf    TRISD;;warning caused by this could be portd instead
-	;banksel PORTD
-	;clrf	PORTD
 
 		banksel 	TRISD;set ports to output
 		clrf 		TRISD
@@ -41,66 +39,35 @@ start   movlw 0x0A
 
 
 
-main	nop
-		btfsc PORTB,0;1;0
+main	nop					;debounce for increment button
+		btfsc PORTB,0;1;0	;bit test bit 0 of register PORTB, if 0 skip next instruction
 		goto btn2
 		call delay
-		btfsc PORTB,0;1;0
-		goto btn2
+		btfsc PORTB,0;1;0	;bit test bit 0 of register PORTB, if 0 skip next instruction
+		goto btn2			;test twice to ensure button is still held down and press was intentional and not bounced
 		call inc7seg
 		;goto main
-btn2	nop
-		btfsc PORTB,1;0
+btn2	nop				;debounce for decrement button
+		btfsc PORTB,1;0	;bit test bit 0 of register PORTB, if 0 skip next instruction
 		goto main
 		call delay
-		btfsc PORTB,1;0
-		goto main
+		btfsc PORTB,1;0	;bit test bit 0 of register PORTB, if 0 skip next instruction
+		goto main		;test twice to ensure button is still held down and press was intentional and not bounced
 		call dec7seg
 		goto main
-;;main 	movlw 0x01;;left switch
-;;		movwf check
-;;		movf PORTB,0;move portb input to working register
-;;		movwf check
-;;		;xorlw check;xorlw check;xorlw check;;xor w with check
-;;		;movwf PORTD
-;;		btfsc check,0;check,1;check if zero flag set, skip if clear
-;;		call inc7seg
-;;		;btfss PORTB,0
-;;goto main;;debug testing first button
-;;	
-;;		movlw 0x02; right button
-;;		movwf check
-;;		movf PORTB,0;move portb input to working register
-;;		
-;;		xorlw check;;xor w with check
-;;		btfsc STATUS,F;check if zero flag set, skip if clear
-;;		call inc7seg
-;;		goto main
 
-
-;inc7seg	
-		
-		;;call delay;delay from Lab2
-;		incf UPCOUNT, 1;update upcounter and copy to W
-;		movf UPCOUNT, 0;working register
-;		decfsz DOWNCOUNT,F
-;		call Table;call table sub
-;		movwf PORTD;;update leds with 7 seg
-;		;goto loopsub
-;		;goto start
-;;		return
 
 inc7seg	nop;;increment 7 sec
-		call Tableupd
+		call Tableupd	;update 7seg value using lookup table
 		;;call delay;delay from Lab2
-		incf UPCOUNT, 1;update upcounter and copy to W
-		movf UPCOUNT, 0;working register
+		incf UPCOUNT, 1	;update upcounter and copy to W
+		movf UPCOUNT, 0	;working register
 		;;decfsz DOWNCOUNT,F
 		;call Table;call table sub
 		
-		decfsz DOWNCOUNT,F;;test to see if max reached if so call reset
+		decfsz DOWNCOUNT,F	;;test to see if max reached if so call reset
 		return
-		call rst7seg
+		call rst7seg ;if overflowed reset display to 0
 		return
 
 dec7seg	nop;;decrement 7 seg
@@ -111,42 +78,9 @@ dec7seg	nop;;decrement 7 seg
 		
 		decfsz UPCOUNT,F;;test to see if max reached if so call reset
 		return
-		call rst7segt
-		
-		
+		call rst7segt ;if underflowed reset display to 9
 		return
 
-;dec7seg	nop;;decrement 7 seg
-;		movf UPCOUNT,0
-;		call Table;call table sub
-;		movwf PORTD;;update leds with 7 seg
-;		;;call delay;delay from Lab2
-;		;decf UPCOUNT, 1;update upcounter and copy to W
-;		;movf UPCOUNT, 0;working register
-;		;;decfsz DOWNCOUNT,F
-;		;call Table;call table sub
-;		incf DOWNCOUNT,1
-;		
-;		decfsz UPCOUNT,F;;test to see if max reached if so call reset
-;		return
-;		call rst7segt
-;		return
-
-;dec7seg	nop;;decrement 7 seg
-;		movf UPCOUNT,0
-;		call Table;call table sub
-;		movwf PORTD;;update leds with 7 seg
-;		;;call delay;delay from Lab2
-;		decf UPCOUNT, 1;update upcounter and copy to W
-;		movf UPCOUNT, 0;working register
-;		;;decfsz DOWNCOUNT,F
-;		;call Table;call table sub
-;		
-;		incfsz DOWNCOUNT,F;;test to see if max reached if so call reset
-;		
-;		return
-;		call rst7segt
-;		return
 
 ;lookup table
 Table 	addwf PCL,F;;mov w to pc
@@ -168,7 +102,7 @@ Table 	addwf PCL,F;;mov w to pc
 		return;14
 		return;15
 
-Tableupd nop;
+Tableupd nop;updates 7seg with the value stored in the working register
 		movf UPCOUNT,0
 		call Table;call table sub
 		movwf PORTD;;update leds with 7 seg
@@ -179,41 +113,29 @@ delay 	movlw outval;load register outer
 		movwf OUTER
 delayx 	movlw inval;load register inner
 		movwf INNER
-delayin decfsz INNER,F
+delayin decfsz INNER,F;decrement, if 0, skip next instruction
 		goto delayin
-		decfsz OUTER,F
+		decfsz OUTER,F;decrement, if 0, skip next instruction
 		goto delayx
 		return
 
-ldsm 	movlw H'0500';load small delay
-		;;movf outval
-		;;movf inval
-		movwf OUTER
-		movwf INNER
-		return
-
-ldlg	movlw H'0000';;loadlarge delay
-		movf outval
-		movf inval
-		return
-
-rst7seg nop
+rst7seg nop;resets the 7 segment to 0
 		movlw 0x0A
-		movwf DOWNCOUNT;;move 10
+		movwf DOWNCOUNT;;move 10 to register
 		;movwf check 
 		movlw 0
 		;movwf PORTD;clear output and Upcount ;;not/Dn count
-		movwf UPCOUNT
+		movwf UPCOUNT;move 0 to register
 		;;movwf DOWNCOUNT
 		return
 
-rst7segt nop
+rst7segt nop;resets the 7 segment display to 9
 		movlw 0x0
-		movwf DOWNCOUNT;;move 10
+		movwf DOWNCOUNT;;move 0
 		;movwf check 
-		movlw 0x09;test finish downcount
+		movlw 0x09
 		;movwf PORTD;clear output and Upcount ;;not/Dn count
-		movwf UPCOUNT
+		movwf UPCOUNT;moves 9 to upcount
 		;;movwf DOWNCOUNT
 		call Table;update table
 		movwf PORTD;;update leds with 7 seg

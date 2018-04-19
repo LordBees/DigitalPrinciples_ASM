@@ -1,10 +1,12 @@
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  1
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-                      00001 #include <p16f877.inc>
+                      00001 ;authors Robert painter, Luke claton
+                      00002 ;stepper motor that roteates in 90 degree increments in both directions when a button is pressed
+                      00003 #include <p16f877.inc>  ;import standard library
                       00001         LIST
                       00002 
                       00003 ;==========================================================================
@@ -14,140 +16,141 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00007 ;==========================================================================
                       00008 
                       00540         LIST
-                      00002 
-                      00003 
-  00000020            00004 INNER   EQU H'0020'
-  00000021            00005 OUTER   EQU H'0021'
-  00000060            00006 outval  EQU H'0060'
-  00000060            00007 inval   EQU H'0060'
-                      00008 
-  00000022            00009 STEPS   EQU H'0022'
-  00000003            00010 STEPSN  EQU H'0003'
-                      00011 
-                      00012 
+                      00004 
+                      00005 
+  00000020            00006 INNER   EQU H'0020'             ;assign delay values
+  00000021            00007 OUTER   EQU H'0021'
+  00000060            00008 outval  EQU H'0060'
+  00000060            00009 inval   EQU H'0060'
+                      00010 
+  00000022            00011 STEPS   EQU H'0022'             ;steps to rotate 
+  00000003            00012 STEPSN  EQU H'0003'
                       00013 
+                      00014 
+                      00015 
 Warning[205]: Found directive in column 1. (banksel)
-0000   1683 1303      00014 banksel         TRISD;set ports to output
+0000   1683 1303      00016 banksel         TRISD;set ports to output
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0002   0188           00015                 clrf            TRISD
-                      00016 
-0003   1283 1303      00017                 banksel         PORTD;clear output
-0005   0188           00018                 clrf            PORTD
-                      00019 ;               movlw           H'0000';0x00
-0006   0088           00020                 movwf           PORTD;,0x00;//changed from clrf
-                      00021 
-                      00022 ;               banksel         TRISB;set input from button
-                      00023 ;               movlw       0xFF
-                      00024 ;               movwf           TRISB
-                      00025                 
-                      00026 
-0007                  00027 start   
+0002   0188           00017                 clrf            TRISD
+                      00018 
+0003   1283 1303      00019                 banksel         PORTD;clear output
+0005   0188           00020                 clrf            PORTD
+                      00021 ;               movlw           H'0000';0x00
+0006   0088           00022                 movwf           PORTD;,0x00;//changed from clrf
+                      00023 
+                      00024 ;               banksel         TRISB;set input from button
+                      00025 ;               movlw       0xFF
+                      00026 ;               movwf           TRISB
+                      00027                 
                       00028 
-0007   0000           00029 main    nop
-0008   1806           00030                 btfsc PORTB,0;1;0
-0009   280E           00031                 goto btn2
-000A   2040           00032                 call delay
-000B   1806           00033                 btfsc PORTB,0;1;0
-000C   280E           00034                 goto btn2
-000D   201E           00035                 call inc90
-                      00036                 ;goto main
-000E   0000           00037 btn2    nop
-000F   1886           00038                 btfsc PORTB,1;0
-0010   2807           00039                 goto main
-0011   2040           00040                 call delay
-0012   1886           00041                 btfsc PORTB,1;0
-0013   2807           00042                 goto main
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  2
+0007                  00029 start   
+                      00030                                                   ;button debouncing    
+0007   0000           00031 main    nop
+0008   1806           00032                 btfsc PORTB,0;1;0 ;test bit 0 of PORTB if bit is clear skip next instruction
+0009   280E           00033                 goto btn2
+000A   2040           00034                 call delay
+000B   1806           00035                 btfsc PORTB,0;1;0;test bit 0 of PORTB if bit is clear skip next instruction
+000C   280E           00036                 goto btn2
+000D   201E           00037                 call inc90
+                      00038                 ;goto main
+000E   0000           00039 btn2    nop
+000F   1886           00040                 btfsc PORTB,1;0;test bit 1 of PORTB if bit is clear skip next instruction
+0010   2807           00041                 goto main
+0011   2040           00042                 call delay
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0014   2016           00043                 call dec90
-0015   2807           00044                 goto main
-                      00045 
-                      00046 ;decrement
-                      00047 ;48 steps for 1 rotation
-                      00048 ;1 move = 4 steps
-                      00049 ;90 degrees = 48/4 = 12 steps
-                      00050 ;3 moves for 90
-                      00051 
-0016   0000           00052 dec90   nop
-0017   3003           00053                 movlw STEPSN;load register outer
-0018   00A2           00054                 movwf STEPS
-0019   2040           00055                 call delay
-001A   2026           00056 dec90s  call Backward
-001B   0BA2           00057                 decfsz STEPS,F
-001C   281A           00058                 goto dec90s
-001D   0008           00059                 return
-                      00060 
-                      00061 
-001E   0000           00062 inc90   nop
-001F   3003           00063                 movlw STEPSN;load register outer
-0020   00A2           00064                 movwf STEPS
-0021   2033           00065 inc90s  call Forward
-0022   2040           00066                 call delay
-0023   0BA2           00067                 decfsz STEPS,F
-0024   2821           00068                 goto inc90s
-0025   0008           00069                 return
-0026                  00070 Backward 
-                      00071 
-0026   3009           00072         movlw  H'0009';1100 0110             
-0027   0088           00073                 movwf  PORTD        
-0028   2040           00074         call delay 
-                      00075 
-0029   3005           00076         movlw  H'0005';1001 0011
-002A   0088           00077         movwf  PORTD
-002B   2040           00078                 call delay
-                      00079 
-002C   3006           00080         movlw  H'0006';0011 1001
-002D   0088           00081         movwf   PORTD
-002E   2040           00082                 call delay 
-                      00083              
-002F   300A           00084         movlw  H'000A';0110 1100
-0030   0088           00085         movwf  PORTD 
-0031   2040           00086         call delay
-                      00087 
-0032   0008           00088         return;goto Forward 
+0012   1886           00043                 btfsc PORTB,1;0;test bit 1 of PORTB if bit is clear skip next instruction
+0013   2807           00044                 goto main
+0014   2016           00045                 call dec90
+0015   2807           00046                 goto main
+                      00047 
+                      00048 ;decrement
+                      00049 ;48 steps for 1 rotation
+                      00050 ;1 move = 4 steps
+                      00051 ;90 degrees = 48/4 = 12 steps
+                      00052 ;3 moves for 90
+                      00053 
+0016   0000           00054 dec90   nop                             ;decrease by 90 degrees
+0017   3003           00055                 movlw STEPSN    ;load register with no of steps
+0018   00A2           00056                 movwf STEPS
+0019   2040           00057                 call delay
+001A   2026           00058 dec90s  call Backward
+001B   0BA2           00059                 decfsz STEPS,F  ;repeat for desired steps
+001C   281A           00060                 goto dec90s
+001D   0008           00061                 return
+                      00062 
+                      00063 
+001E   0000           00064 inc90   nop                             ;increase by 90 degrees
+001F   3003           00065                 movlw STEPSN    ;load register with no of steps
+0020   00A2           00066                 movwf STEPS
+0021   2033           00067 inc90s  call Forward
+0022   2040           00068                 call delay
+0023   0BA2           00069                 decfsz STEPS,F  ;repeat for desired steps
+0024   2821           00070                 goto inc90s
+0025   0008           00071                 return
+                      00072 
+0026                  00073 Backward                                ;go backward
+0026   3009           00074         movlw  H'0009'  ;1100 0110           
+0027   0088           00075                 movwf  PORTD        
+0028   2040           00076         call delay              ;delay
+                      00077 
+0029   3005           00078         movlw  H'0005'  ;1001 0011
+002A   0088           00079         movwf  PORTD
+002B   2040           00080                 call delay              ;delay
+                      00081 
+002C   3006           00082         movlw  H'0006'  ;0011 1001
+002D   0088           00083         movwf   PORTD
+002E   2040           00084                 call delay              ;delay
+                      00085              
+002F   300A           00086         movlw  H'000A'  ;0110 1100
+0030   0088           00087         movwf  PORTD 
+0031   2040           00088         call delay              ;delay
                       00089 
-                      00090 
-0033                  00091 Forward                                 ;R|L
-0033   300A           00092         movlw  H'000A';      
-0034   0088           00093                 movwf  PORTD        
-0035   2040           00094         call delay 
-                      00095 
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  3
+0032   0008           00090         return 
+                      00091 
+                      00092 
+0033                  00093 Forward                                 ;R|L go forward
+0033   300A           00094         movlw  H'000A'  ;0110 1100           
+0034   0088           00095                 movwf  PORTD        
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  3
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0036   3006           00096         movlw  H'0006';
-0037   0088           00097         movwf  PORTD
-0038   2040           00098                 call delay
-                      00099 
-0039   3005           00100         movlw  H'0005';
-003A   0088           00101         movwf   PORTD
-003B   2040           00102                 call delay 
-                      00103              
-003C   3009           00104         movlw  H'0009';
-003D   0088           00105         movwf  PORTD 
-003E   2040           00106         call delay
-                      00107 
-003F   0008           00108         return;goto Forward 
+0035   2040           00096         call delay              ;delay
+                      00097 
+0036   3006           00098         movlw  H'0006'  ;0011 1001
+0037   0088           00099         movwf  PORTD
+0038   2040           00100                 call delay              ;delay
+                      00101 
+0039   3005           00102         movlw  H'0005'  ;1001 0011
+003A   0088           00103         movwf   PORTD
+003B   2040           00104                 call delay              ;delay
+                      00105              
+003C   3009           00106         movlw  H'0009'  ;1100 0110
+003D   0088           00107         movwf  PORTD 
+003E   2040           00108         call delay              ;delay
                       00109 
-0040   3060           00110 delay   movlw outval;load register outer
-0041   00A1           00111                 movwf OUTER
-0042   3060           00112 delayx  movlw inval;load register inner
-0043   00A0           00113                 movwf INNER
-0044   0BA0           00114 delayin decfsz INNER,F
-0045   2844           00115                 goto delayin
-0046   0BA1           00116                 decfsz OUTER,F
-0047   2842           00117                 goto delayx
-0048   0008           00118                 return
+003F   0008           00110         return 
+                      00111 
+                      00112                                                 ;delay sub
+0040   3060           00113 delay   movlw outval    ;load register outer
+0041   00A1           00114                 movwf OUTER
+0042   3060           00115 delayx  movlw inval             ;load register inner
+0043   00A0           00116                 movwf INNER
+0044   0BA0           00117 delayin decfsz INNER,F
+0045   2844           00118                 goto delayin
+0046   0BA1           00119                 decfsz OUTER,F
+0047   2842           00120                 goto delayx
+0048   0008           00121                 return
 Warning[205]: Found directive in column 1. (end)
-                      00119 end
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  4
+                      00122 end
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  4
 
 
 SYMBOL TABLE
@@ -206,7 +209,7 @@ CREN                              00000004
 CSRC                              00000007
 D                                 00000005
 DATA_ADDRESS                      00000005
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  5
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  5
 
 
 SYMBOL TABLE
@@ -265,7 +268,7 @@ OERR                              00000001
 OPTION_REG                        00000081
 OUTER                             00000021
 P                                 00000004
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  6
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  6
 
 
 SYMBOL TABLE
@@ -324,7 +327,7 @@ RC6                               00000006
 RC7                               00000007
 RC8_9                             00000006
 RC9                               00000006
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  7
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  7
 
 
 SYMBOL TABLE
@@ -383,7 +386,7 @@ T0CS                              00000005
 T0IE                              00000005
 T0IF                              00000002
 T0SE                              00000004
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  8
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  8
 
 
 SYMBOL TABLE
@@ -442,7 +445,7 @@ TRISC5                            00000005
 TRISC6                            00000006
 TRISC7                            00000007
 TRISD                             00000088
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE  9
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE  9
 
 
 SYMBOL TABLE
@@ -501,7 +504,7 @@ _IDLOC1                           00002001
 _IDLOC2                           00002002
 _IDLOC3                           00002003
 _LP_OSC                           00003FFC
-MPASM  5.51                       STEPPER.ASM   4-11-2018  11:30:17         PAGE 10
+MPASM  5.51                       STEPPER.ASM   4-19-2018  9:32:43         PAGE 10
 
 
 SYMBOL TABLE

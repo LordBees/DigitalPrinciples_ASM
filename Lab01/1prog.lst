@@ -1,14 +1,12 @@
-MPASM  5.51                         1PROG.ASM   2-28-2018  10:30:01         PAGE  1
+MPASM  5.51                         1PROG.ASM   4-18-2018  18:58:04         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
                       00001 ;first asm file
-                      00002 ;include "P16F877.INC";include register names
-                      00003                                          ;from another source file
 Warning[205]: Found directive in column 1. (include)
-                      00004 include "p16f877.inc"
+                      00002 include "p16f877.inc";include register names
                       00001         LIST
                       00002 
                       00003 ;==========================================================================
@@ -18,14 +16,15 @@ Warning[205]: Found directive in column 1. (include)
                       00007 ;==========================================================================
                       00008 
                       00540         LIST
-                      00005 
-0000   3000           00006 start movlw 0;
-                      00007 
-0001   3E01           00008 loop addlw 1;
-0002   0000           00009          nop;
-0003   2801           00010          goto loop;
-                      00011          end;
-MPASM  5.51                         1PROG.ASM   2-28-2018  10:30:01         PAGE  2
+                      00003                                          ;from another source file
+                      00004 
+0000   3000           00005 start movlw 0   ;move literal value 0 into the working register
+                      00006 
+0001   3E01           00007 loop addlw 1    ;add literal value 1 to the working register
+0002   0000           00008          nop;           ;no operation
+0003   2801           00009          goto loop      ;;goto label loop
+                      00010          end            ;;end program
+MPASM  5.51                         1PROG.ASM   4-18-2018  18:58:04         PAGE  2
 
 
 SYMBOL TABLE
@@ -84,7 +83,7 @@ CSRC                              00000007
 D                                 00000005
 DATA_ADDRESS                      00000005
 DC                                00000001
-MPASM  5.51                         1PROG.ASM   2-28-2018  10:30:01         PAGE  3
+MPASM  5.51                         1PROG.ASM   4-18-2018  18:58:04         PAGE  3
 
 
 SYMBOL TABLE
@@ -143,7 +142,7 @@ PCFG0                             00000000
 PCFG1                             00000001
 PCFG2                             00000002
 PCFG3                             00000003
-MPASM  5.51                         1PROG.ASM   2-28-2018  10:30:01         PAGE  4
+MPASM  5.51                         1PROG.ASM   4-18-2018  18:58:04         PAGE  4
 
 
 SYMBOL TABLE
@@ -202,7 +201,7 @@ RCD8                              00000000
 RCEN                              00000003
 RCIE                              00000005
 RCIF                              00000005
-MPASM  5.51                         1PROG.ASM   2-28-2018  10:30:01         PAGE  5
+MPASM  5.51                         1PROG.ASM   4-18-2018  18:58:04         PAGE  5
 
 
 SYMBOL TABLE
@@ -261,7 +260,7 @@ T1CON                             00000010
 T1INSYNC                          00000002
 T1OSCEN                           00000003
 T1SYNC                            00000002
-MPASM  5.51                         1PROG.ASM   2-28-2018  10:30:01         PAGE  6
+MPASM  5.51                         1PROG.ASM   4-18-2018  18:58:04         PAGE  6
 
 
 SYMBOL TABLE
@@ -320,7 +319,7 @@ TRISD2                            00000002
 TRISD3                            00000003
 TRISD4                            00000004
 TRISD5                            00000005
-MPASM  5.51                         1PROG.ASM   2-28-2018  10:30:01         PAGE  7
+MPASM  5.51                         1PROG.ASM   4-18-2018  18:58:04         PAGE  7
 
 
 SYMBOL TABLE
@@ -379,7 +378,7 @@ _PWRTE_OFF                        00003FFF
 _PWRTE_ON                         00003FF7
 _RC_OSC                           00003FFF
 _WDTE_OFF                         00003FFB
-MPASM  5.51                         1PROG.ASM   2-28-2018  10:30:01         PAGE  8
+MPASM  5.51                         1PROG.ASM   4-18-2018  18:58:04         PAGE  8
 
 
 SYMBOL TABLE

@@ -1,11 +1,10 @@
 ;first asm file
-;include "P16F877.INC";include register names
+include "p16f877.inc";include register names
 					 ;from another source file
-include "p16f877.inc"
 
-start movlw 0;
+start movlw 0	;move literal value 0 into the working register
 
-loop addlw 1;
-	 nop;
-	 goto loop;
-	 end;
+loop addlw 1	;add literal value 1 to the working register
+	 nop;		;no operation
+	 goto loop	;;goto label loop
+	 end		;;end program

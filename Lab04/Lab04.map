@@ -1,18 +1,18 @@
 MPLINK 4.49, Linker
-Linker Map File - Created Wed Mar 14 11:57:51 2018
+Linker Map File - Created Thu Apr 19 06:28:10 2018
 
                                  Section Info
                   Section       Type    Address   Location Size(Bytes)
                 ---------  ---------  ---------  ---------  ---------
-                   .org_0       code   0x000000    program   0x0000be
+                   .org_0       code   0x000000    program   0x0000ae
 
 
 
                               Program Memory Usage 
                                Start         End      
                            ---------   ---------      
-                            0x000000    0x00005e      
-            95 out of 8454 program addresses used, program memory utilization is 1%
+                            0x000000    0x000056      
+            87 out of 8454 program addresses used, program memory utilization is 1%
 
 
 
@@ -27,11 +27,9 @@ Linker Map File - Created Wed Mar 14 11:57:51 2018
                   delayin   0x000044    program     static H:\DP_MPLAB\Lab04\Lab04.asm
                    delayx   0x000042    program     static H:\DP_MPLAB\Lab04\Lab04.asm
                   inc7seg   0x00001a    program     static H:\DP_MPLAB\Lab04\Lab04.asm
-                     ldlg   0x00004d    program     static H:\DP_MPLAB\Lab04\Lab04.asm
-                     ldsm   0x000049    program     static H:\DP_MPLAB\Lab04\Lab04.asm
                      main   0x00000b    program     static H:\DP_MPLAB\Lab04\Lab04.asm
-                  rst7seg   0x000051    program     static H:\DP_MPLAB\Lab04\Lab04.asm
-                 rst7segt   0x000057    program     static H:\DP_MPLAB\Lab04\Lab04.asm
+                  rst7seg   0x000049    program     static H:\DP_MPLAB\Lab04\Lab04.asm
+                 rst7segt   0x00004f    program     static H:\DP_MPLAB\Lab04\Lab04.asm
                     start   0x000007    program     static H:\DP_MPLAB\Lab04\Lab04.asm
 
 
@@ -49,9 +47,7 @@ Linker Map File - Created Wed Mar 14 11:57:51 2018
                     delay   0x000040    program     static H:\DP_MPLAB\Lab04\Lab04.asm
                    delayx   0x000042    program     static H:\DP_MPLAB\Lab04\Lab04.asm
                   delayin   0x000044    program     static H:\DP_MPLAB\Lab04\Lab04.asm
-                     ldsm   0x000049    program     static H:\DP_MPLAB\Lab04\Lab04.asm
-                     ldlg   0x00004d    program     static H:\DP_MPLAB\Lab04\Lab04.asm
-                  rst7seg   0x000051    program     static H:\DP_MPLAB\Lab04\Lab04.asm
-                 rst7segt   0x000057    program     static H:\DP_MPLAB\Lab04\Lab04.asm
+                  rst7seg   0x000049    program     static H:\DP_MPLAB\Lab04\Lab04.asm
+                 rst7segt   0x00004f    program     static H:\DP_MPLAB\Lab04\Lab04.asm
 
 

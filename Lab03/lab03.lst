@@ -1,11 +1,12 @@
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  1
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
                       00001 
-                      00002         include "p16f877.inc"
+Warning[205]: Found directive in column 1. (include)
+                      00002 include "p16f877.inc";include header file
                       00001         LIST
                       00002 
                       00003 ;==========================================================================
@@ -16,7 +17,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00008 
                       00540         LIST
                       00003 
-  00000020            00004 INNER EQU H'0020'
+  00000020            00004 INNER EQU H'0020';setup delay values
   00000021            00005 OUTER EQU H'0021'
   00000000            00006 outval EQU H'0000'
   00000000            00007 inval EQU H'0000'
@@ -24,15 +25,15 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
   00000022            00009 UPCOUNT         EQU H'0022'
   00000023            00010 DOWNCOUNT       EQU H'0023'
                       00011 
-0000   1683 1303      00012         banksel TRISD
+0000   1683 1303      00012                 banksel TRISD;;setup input and output banks
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0002   0188           00013         clrf    TRISD;;warning caused by this could be portd instead
-0003   1283 1303      00014         banksel PORTD
-0005   0188           00015         clrf    PORTD
+0002   0188           00013                 clrf    TRISD
+0003   1283 1303      00014                 banksel PORTD
+0005   0188           00015                 clrf    PORTD
                       00016 
-0006   300A           00017 start   movlw 0x0A
+0006   300A           00017 start   movlw 0x0A;move 10 into the upcount register
 0007   00A3           00018                 movwf DOWNCOUNT;;move 10 
-0008   3000           00019                 movlw 0
+0008   3000           00019                 movlw 0;move 0 into the downcount register
                       00020                 ;movwf PORTD;clear output and Upcount ;;not/Dn count
 0009   00A2           00021                 movwf UPCOUNT
                       00022                 ;;movwf DOWNCOUNT
@@ -56,13 +57,13 @@ Message[302]: Register in operand not in bank 0.  Ensure that bank bits are corr
                       00040 
 0013   3488           00041                 retlw H'0088';0
 0014   34ED           00042                 retlw H'00ED';1
-0015   3494           00043                 retlw H'0094';2
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  2
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
+0015   3494           00043                 retlw H'0094';2
 0016   34A4           00044                 retlw H'00A4';3
 0017   34E1           00045                 retlw H'00E1';4
 0018   34A2           00046                 retlw H'00A2';5
@@ -84,7 +85,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 0025   0008           00062                 return
                       00063 ;;end program
                       00064                 end
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  3
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  3
 
 
 SYMBOL TABLE
@@ -143,7 +144,7 @@ CSRC                              00000007
 D                                 00000005
 DATA_ADDRESS                      00000005
 DC                                00000001
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  4
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  4
 
 
 SYMBOL TABLE
@@ -202,7 +203,7 @@ OPTION_REG                        00000081
 OUTER                             00000021
 P                                 00000004
 PCFG0                             00000000
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  5
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  5
 
 
 SYMBOL TABLE
@@ -261,7 +262,7 @@ RC7                               00000007
 RC8_9                             00000006
 RC9                               00000006
 RCD8                              00000000
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  6
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  6
 
 
 SYMBOL TABLE
@@ -320,7 +321,7 @@ T0SE                              00000004
 T1CKPS0                           00000004
 T1CKPS1                           00000005
 T1CON                             00000010
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  7
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  7
 
 
 SYMBOL TABLE
@@ -379,7 +380,7 @@ TRISD                             00000088
 TRISD0                            00000000
 TRISD1                            00000001
 TRISD2                            00000002
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  8
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  8
 
 
 SYMBOL TABLE
@@ -438,7 +439,7 @@ _IDLOC2                           00002002
 _IDLOC3                           00002003
 _LP_OSC                           00003FFC
 _LVP_OFF                          00003F7F
-MPASM  5.51                         LAB03.ASM   2-28-2018  11:33:51         PAGE  9
+MPASM  5.51                         LAB03.ASM   4-19-2018  5:47:38         PAGE  9
 
 
 SYMBOL TABLE
@@ -480,7 +481,7 @@ Program Memory Words Free:  8154
 
 
 Errors   :     0
-Warnings :     0 reported,     0 suppressed
+Warnings :     1 reported,     0 suppressed
 Messages :     1 reported,     0 suppressed
 
 

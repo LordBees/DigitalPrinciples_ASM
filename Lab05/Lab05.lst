@@ -1,4 +1,4 @@
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  1
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
@@ -7,10 +7,11 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00001 ;*******************************************************************************************************
                             ****
                       00002 ;*                                     This program configures the A/D Module to convert on     
-                      00003 ;*                                     A/D channel 3 (the potentiometer) and display the             
-                      00004 ;*                                     results on the LEDS on PORTD.                                    
-                                   
-                      00005 ; *                                    Written by Patrick Wraith
+                      00003 ;*                                     A/D channel 2 (the light dependant resistor) and display the     
+                                    
+                      00004 ;*                                     results on the 7 SEG display on PORTD.                           
+                                            
+                      00005 ; *                                    Written by Robert painter
                       00006 ;*******************************************************************************************************
                             ****
                       00007         include "p16f877.inc"
@@ -32,37 +33,39 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00013                                                                 ;TRISD/TRISA/OPTION/ADCON1
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
 0002   0188           00014                 clrf    TRISD                   ;Clear PORTD as outputs for the leds
-0003   303F           00015                 movlw   H'003F'                 ;Set up Port A as inputs
+0003   303F           00015                 movlw   H'003F'                 ;Set up Port A as inputs and ensure ldr is enabled
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
 0004   0085           00016                 movwf   TRISA                   ;
-0005   3002           00017                 movlw   H'0002'                 ;Study the ADCON1 register to see what 
+0005   3002           00017                 movlw   H'0002'                 ; 
 Message[302]: Register in operand not in bank 0.  Ensure that bank bits are correct.
-0006   009F           00018                 movwf   ADCON1                  ;has been set up here.  Note it here!   
-0007   1283           00019                 bcf     STATUS, RP0                     ;What happens here?  Note it here!
-0008   3051           00020                 movlw   B'01010001'             ;What bits have been set in ADCON0 and why?
-0009   009F           00021                 movwf   ADCON0                  ;Note it here!
-000A   151F           00022 Main    bsf     ADCON0, GO_DONE         ;Start A/D conversion. How ?
+0006   009F           00018                 movwf   ADCON1                  ;       
+0007   1283           00019                 bcf     STATUS, RP0                     ; 
+0008   3051           00020                 movlw   B'01010001'             ;bit 4 has been unset this causes the channel to be 010 
+                            corresponding to the LDR
+0009   009F           00021                 movwf   ADCON0                  ;load adcon inputs
+000A   151F           00022 Main    bsf     ADCON0, GO_DONE         ;Start A/D conversion
 000B   3010           00023                 movlw   10                              ;The sample and Hold of the A-D converter
-000C   00A0           00024                 movwf   COUNTER                 ;Needs a while to settle.
-000D   0BA0           00025 Delay   decfsz COUNTER,F                ;What happened here then?
+000C   00A0           00024                 movwf   COUNTER                 ;resample values to get data 
+000D   0BA0           00025 Delay   decfsz COUNTER,F                ;do it for an amount of times
 000E   280D           00026                 goto    Delay           
 000F   191F           00027 Conv    btfsc   ADCON0, GO_DONE ;Test this bit to check that A/D          
                       00028                                                                 ;conversion is complete
-0010   280F           00029                 goto    Conv                    ;Keep checking until it is.
-                      00030                 ;movf   ADRESH,W                ;Write A/D result into w. Is this a 10 bit value? 
-                      00031                 ;movwf  PORTD                   ;Send it to the LEDs. 
-0011   0C9E           00032                 rrf ADRESH,1 ;rotate adress
-0012   0C9E           00033                 rrf ADRESH,1 ;rotate adress
-0013   0C9E           00034                 rrf ADRESH,1 ;rotate adress
-0014   0C1E           00035                 rrf ADRESH,0 ;rotate adress
-0015   390F           00036                 andlw B'00001111' ; and address so that we get a range of values(the higher ones for bet
-                            ter range)
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  2
+0010   280F           00029                 goto    Conv                    ;Keep checking until it is. 
+0011   0C9E           00030                 rrf ADRESH,1 ;rotate adress right 1 for 4 times
+0012   0C9E           00031                 rrf ADRESH,1 ;rotate adress
+0013   0C9E           00032                 rrf ADRESH,1 ;rotate adress
+0014   0C1E           00033                 rrf ADRESH,0 ;rotate adress
+0015   390F           00034                 andlw B'00001111'   ;and address so that we get a range of values(the higher ones for be
+                            tter range)
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
+                      00035                                                         ;the high nibble has been shifted to the low nib
+                            ble so that the value can be 
+                      00036                                                         ;passed easily to the 7 seg lookup table 
 0016   2029           00037                 call Tableupd; update the 7 seg with the data obtained
 0017   280A           00038                 goto    Main                    ;Do it again
                       00039 
@@ -97,7 +100,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
 002C   0008           00068                 return
                       00069 
                       00070                 end
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  3
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  3
 
 
 SYMBOL TABLE
@@ -156,7 +159,7 @@ CREN                              00000004
 CSRC                              00000007
 Conv                              0000000F
 D                                 00000005
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  4
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  4
 
 
 SYMBOL TABLE
@@ -215,7 +218,7 @@ OBF                               00000006
 OERR                              00000001
 OPTION_REG                        00000081
 P                                 00000004
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  5
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  5
 
 
 SYMBOL TABLE
@@ -274,7 +277,7 @@ RC6                               00000006
 RC7                               00000007
 RC8_9                             00000006
 RC9                               00000006
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  6
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  6
 
 
 SYMBOL TABLE
@@ -333,7 +336,7 @@ T0IE                              00000005
 T0IF                              00000002
 T0SE                              00000004
 T1CKPS0                           00000004
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  7
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  7
 
 
 SYMBOL TABLE
@@ -392,7 +395,7 @@ TRISC6                            00000006
 TRISC7                            00000007
 TRISD                             00000088
 TRISD0                            00000000
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  8
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  8
 
 
 SYMBOL TABLE
@@ -451,7 +454,7 @@ _IDLOC0                           00002000
 _IDLOC1                           00002001
 _IDLOC2                           00002002
 _IDLOC3                           00002003
-MPASM  5.51                         LAB05.ASM   3-21-2018  11:25:54         PAGE  9
+MPASM  5.51                         LAB05.ASM   4-19-2018  6:50:52         PAGE  9
 
 
 SYMBOL TABLE

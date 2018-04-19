@@ -1,11 +1,11 @@
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  1
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  1
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
                       00001 ;Delay.asm. This is a PIC assembly language source file for a time delay
-                      00002 ; Author: Your Name
+                      00002 ; Author: Robert painter
                       00003 ;Date
                       00004 
                       00005 ;**********************************SETUP***************************
@@ -20,50 +20,51 @@ Warning[205]: Found directive in column 1. (include)
                       00007 ;==========================================================================
                       00008 
                       00540         LIST
-                      00007                                 ;another source file
-                      00008 ;TIMREG  EQU     H'0020'        ;This tells the assembler that                                          
-                                                                                         ;register 20 is named (or equates t
-  00000005            00009 delval       EQU         H'0005'        ;this is the delay time value 5
-                      00010                                         ;to allow you to single step around.
-  00000020            00011 INNER EQU H'0020'
-  00000021            00012 OUTER EQU H'0021'
+                      00007                                                 ;another source file
+                      00008 ;TIMREG  EQU     H'0020'                ;This tells the assembler that                                  
+                                                                                                 
+                      00009                                                                 ;register 20 is named (or equates to) va
+                            lue delval 
+  00000005            00010 delval EQU H'0005'                              ;this is the delay time value 5.
+  00000020            00011 INNER  EQU H'0020'                              ;defining the values to be used
+  00000021            00012 OUTER  EQU H'0021'
   00000000            00013 outval EQU H'0000'
-  00000000            00014 inval EQU H'0000'
+  00000000            00014 inval  EQU H'0000'
                       00015 
                       00016 ;*******************************PORT SETUP*************************
                       00017 
                       00018 
-0000   1683 1303      00019                 Banksel         TRISD           ;change register bank (page)
-0002   0188           00020                 clrf     PORTD          ;make PORTD an output port
-0003   1283 1303      00021                 banksel  PORTD  ;change back to original bank
+0000   1683 1303      00019                 Banksel TRISD           ;change register bank (page)
+0002   0188           00020                 clrf    PORTD           ;make PORTD an output port
+0003   1283 1303      00021                 banksel PORTD           ;change back to original bank
                       00022 ;************************************MAIN**************************
-0005   3000           00023 start   movlw 0                 ;move 'literal'value 0 into the W register
-0006   0088           00024                 movwf     PORTD         ;clear LEDs on PORTD
-0007   0A88           00025 loop    incf PORTD,F            ;update the LEDs by incrementing them 
+0005   3000           00023 start   movlw 0                         ;move 'literal'value 0 into the W register
+0006   0088           00024                 movwf PORTD                     ;clear LEDs on PORTD
+0007   0A88           00025 loop    incf  PORTD,F           ;update the LEDs by incrementing them 
                       00026                 ;;start loop
-0008   200B           00027                 call delay
-0009   0000           00028                 nop                             ;do nothing at all for one machine cycle except incremen
-                            t the program counter           
+0008   200B           00027                 call  delay                     ;call delay routine
+0009   0000           00028                 nop                                     ;do nothing at all for one machine cycle except 
+                            increment the program counter           
                       00029                 ;;end of loop           
-000A   2807           00030                 goto loop                       ;go back to the instruction labelled 'loop'
+000A   2807           00030                 goto  loop                      ;go back to the instruction labelled 'loop'
                       00031 ;******************************DELAY SUBROUTINE****************
                       00032 
                       00033 
-000B   3000           00034 delay   movlw outval;load register outer
-000C   00A1           00035                 movwf OUTER
-000D   3000           00036 delayx  movlw inval;load register inner
-000E   00A0           00037                 movwf INNER
-000F   0BA0           00038 delayin decfsz INNER,F
-0010   280F           00039                 goto delayin
-0011   0BA1           00040                 decfsz OUTER,F
-0012   280D           00041                 goto delayx
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  2
+000B   3000           00034 delay   movlw outval    ;load register outer
+000C   00A1           00035                 movwf OUTER             ;move working register to file register  
+000D   3000           00036 delayx  movlw inval             ;load register inner
+000E   00A0           00037                 movwf INNER             ;move working register to file register  
+000F   0BA0           00038 delayin decfsz INNER,F  ;decrement inner register,skip if zero
+0010   280F           00039                 goto delayin    ;goto delayin label
+0011   0BA1           00040                 decfsz OUTER,F  ;decrement inner register,skip if zero
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  2
 
 
 LOC  OBJECT CODE     LINE SOURCE TEXT
   VALUE
 
-0013   0008           00042                 return
+0012   280D           00041                 goto delayx             ;goto delayx label
+0013   0008           00042                 return                  ;return
                       00043 
                       00044 ;delayi         decfsz INNER;;decrement inner to 0 then return
                       00045 ;               call delayi
@@ -74,7 +75,7 @@ LOC  OBJECT CODE     LINE SOURCE TEXT
                       00050 
 Warning[205]: Found directive in column 1. (end)
                       00051 end                             ;this tells the assembler that we're done.
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  3
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  3
 
 
 SYMBOL TABLE
@@ -133,7 +134,7 @@ CSRC                              00000007
 D                                 00000005
 DATA_ADDRESS                      00000005
 DC                                00000001
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  4
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  4
 
 
 SYMBOL TABLE
@@ -192,7 +193,7 @@ OUTER                             00000021
 P                                 00000004
 PCFG0                             00000000
 PCFG1                             00000001
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  5
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  5
 
 
 SYMBOL TABLE
@@ -251,7 +252,7 @@ RC8_9                             00000006
 RC9                               00000006
 RCD8                              00000000
 RCEN                              00000003
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  6
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  6
 
 
 SYMBOL TABLE
@@ -310,7 +311,7 @@ T1CKPS0                           00000004
 T1CKPS1                           00000005
 T1CON                             00000010
 T1INSYNC                          00000002
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  7
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  7
 
 
 SYMBOL TABLE
@@ -369,7 +370,7 @@ TRISD0                            00000000
 TRISD1                            00000001
 TRISD2                            00000002
 TRISD3                            00000003
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  8
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  8
 
 
 SYMBOL TABLE
@@ -428,7 +429,7 @@ _LVP_OFF                          00003F7F
 _LVP_ON                           00003FFF
 _PWRTE_OFF                        00003FFF
 _PWRTE_ON                         00003FF7
-MPASM  5.51                         1PROG.ASM   2-7-2018  11:42:34         PAGE  9
+MPASM  5.51                         1PROG.ASM   4-19-2018  4:02:00         PAGE  9
 
 
 SYMBOL TABLE

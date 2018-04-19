@@ -1,4 +1,1 @@
-Message[302] H:\DP_MPLAB\LAB04\LAB04.ASM 21 : Register in operand not in bank 0.  Ensure that bank bits are correct.
-Warning[202] H:\DP_MPLAB\LAB04\LAB04.ASM 188 : Argument out of range.  Least significant bits used.
-Message[305] H:\DP_MPLAB\LAB04\LAB04.ASM 196 : Using default destination of 1 (file).
-Message[305] H:\DP_MPLAB\LAB04\LAB04.ASM 197 : Using default destination of 1 (file).
+Message[302] H:\DP_MPLAB\LAB04\LAB04.ASM 19 : Register in operand not in bank 0.  Ensure that bank bits are correct.
